@@ -167,5 +167,28 @@ export default [
                 name: 'inspiration',
             }
         ]
-    }
+    },
+    {
+        name: 'Code Snippet Generator',
+        desc: 'Generate code snippets for common programming tasks in various languages.',
+        category: 'Coding',
+        icon: '/code.png',
+        aiPrompt: 'Generate a code snippet for the given task in the specified programming language.',
+        slug: 'code-snippet-generator',
+        form: [
+            {
+                label: 'Enter the programming language',
+                field: 'input',
+                name: 'language',
+                required: true
+            },
+            {
+                label: 'Describe the task or function',
+                field: 'textarea',
+                name: 'task',
+                required: true
+            }
+        ]
+    },
+    
 ];
