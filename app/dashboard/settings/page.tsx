@@ -3,7 +3,7 @@ import React from 'react'
 
 function page() {
   return (
-    <div className='flex items-center justify-center h-full'>
+    <div className='flex items-center min-h-dvh justify-center h-full'>
        <UserProfile/>
     </div>
   )
