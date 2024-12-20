@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2Icon, ArrowLeft } from "lucide-react";
 import { desc } from "drizzle-orm";
 import { eq } from "drizzle-orm/expressions";
+import { jsPDF } from "jspdf";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -60,6 +61,40 @@ const HistoryPage = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  // Function to handle downloading the specific history entry as a PDF
+  const handleDownloadPDF = (entry: any) => {
+    const doc = new jsPDF(); // Create a new jsPDF document
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+
+    // Title
+    doc.text(`AI Response History - ${entry.templateSlug}`, 10, 10);
+    doc.text(`Date: ${entry.createdAt}`, 10, 20);
+
+    // Add the AI response, and ensure text wraps properly.
+    let yPos = 30; // Initial Y position for text
+
+    const response = entry.aiResponse;
+    const maxWidth = 180; // Maximum width before wrapping
+
+    // Split text into lines to wrap around the page
+    const lines = doc.splitTextToSize(response, maxWidth);
+
+    // Add the response lines to the PDF, adjusting for new lines
+    for (let i = 0; i < lines.length; i++) {
+      doc.text(lines[i], 10, yPos);
+      yPos += 8; // Increase Y position for the next line
+      if (yPos > 270) {  // Check if the content exceeds the bottom of the page
+        doc.addPage(); // Add a new page
+        yPos = 10; // Reset Y position to the top of the new page
+      }
+    }
+
+    // Save the generated PDF with a dynamic name based on the entry
+    doc.save(`${entry.templateSlug}_history.pdf`);
   };
 
   if (loading) {
@@ -125,6 +160,12 @@ const HistoryPage = () => {
                   className="text-xs sm:text-sm bg-red-600 text-white hover:bg-red-700 px-3 py-1 rounded"
                 >
                   Delete
+                </Button>
+                <Button
+                  onClick={() => handleDownloadPDF(entry)}
+                  className="text-xs sm:text-sm bg-green-600 text-white hover:bg-green-700 px-3 py-1 rounded"
+                >
+                  Download as PDF
                 </Button>
               </div>
             </div>
