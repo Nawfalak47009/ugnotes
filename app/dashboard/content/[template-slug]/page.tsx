@@ -30,7 +30,7 @@ function CreateNewContent(props: PROPS) {
 
     const [loading, setLoading] = useState(false);
     const [aiOutput, setAIOutput] = useState<string>("");
-    const { user } = useUser();
+    const { user } = useUser(); // Get current user data
 
     const GenerateAIContent = async (formData: any) => {
         setLoading(true);
@@ -45,12 +45,15 @@ function CreateNewContent(props: PROPS) {
             console.log("AI Response:", responseText);
             setAIOutput(responseText);
 
-            // Save all data even if some are missing
-            await SaveInDb(
-                JSON.stringify(formData),
-                selectedTemplate?.slug || "unknown-slug",
-                responseText || "No AI Response"
-            );
+            // Save all data, including userId
+            if (user) {
+                await SaveInDb(
+                    JSON.stringify(formData),
+                    selectedTemplate?.slug || "unknown-slug",
+                    responseText || "No AI Response",
+                    user.id // Include the userId
+                );
+            }
         } catch (error) {
             console.error("Error generating AI content:", error);
         }
@@ -58,29 +61,32 @@ function CreateNewContent(props: PROPS) {
         setLoading(false);
     };
 
-    const SaveInDb = async (formData: string, slug: string, aiResponse: string) => {
+    const SaveInDb = async (formData: string, slug: string, aiResponse: string, userId: string) => {
         // Ensure the email is available
         const createdByEmail = user?.primaryEmailAddress?.emailAddress;
         if (!createdByEmail) {
             console.error("User email is unavailable.");
             return; // Prevent saving if email is not available
         }
-
+    
         const createdAt = moment().toISOString(); // Always set a valid timestamp
-
+    
         try {
+            // Insert the userId as a string, no need to convert to number
             await db.insert(AIOutput).values({
                 formData,
                 templateSlug: slug,
                 aiResponse,
-                createdBy: createdByEmail, // Ensure we store the correct user email
-                createdAt:moment().format('DD/MM/YYYY'),
+                createdBy: createdByEmail, // Store the user email
+                createdAt: moment().format('DD/MM/YYYY'),
+                userId: userId, // Store userId as string
             });
             console.log("Data saved successfully!");
         } catch (error) {
             console.error("Error saving to database:", error);
         }
     };
+    
 
     return (
         <div className="p-10">

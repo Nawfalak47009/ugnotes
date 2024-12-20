@@ -4,10 +4,11 @@ import { useRouter } from "next/navigation";
 import { db } from "@/utils/db";
 import { AIOutput } from "@/utils/schema";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon, ArrowLeft, Search } from "lucide-react";
+import { Loader2Icon, ArrowLeft, Search, X } from "lucide-react";
 import { desc } from "drizzle-orm";
 import { eq } from "drizzle-orm/expressions";
 import { jsPDF } from "jspdf";
+import { useAuth } from "@clerk/nextjs"; // Replace with your authentication provider
 
 const ITEMS_PER_PAGE = 8;
 
@@ -18,22 +19,33 @@ const HistoryPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEntry, setSelectedEntry] = useState<any | null>(null);
   const router = useRouter();
+  const { userId } = useAuth(); // Get the current authenticated user's ID
 
   useEffect(() => {
     const fetchHistory = async () => {
+      if (!userId) return; // Only fetch if user is authenticated
+  
+      const stringUserId = userId; // Use userId directly as string
+  
       setLoading(true);
       try {
-        const result = await db.select().from(AIOutput).orderBy(desc(AIOutput.createdAt));
+        const result = await db
+          .select()
+          .from(AIOutput)
+          .where(eq(AIOutput.userId, stringUserId)) // Ensure comparison as string
+          .orderBy(desc(AIOutput.createdAt));
+  
         setHistory(result);
       } catch (error) {
         console.error("Error fetching history:", error);
       }
       setLoading(false);
     };
-
+  
     fetchHistory();
-  }, []);
-
+  }, [userId]);
+  
+  
   const handleCopy = (aiResponse: string) => {
     navigator.clipboard
       .writeText(aiResponse)
@@ -99,16 +111,35 @@ const HistoryPage = () => {
     doc.save(`${entry.templateSlug}_history.pdf`);
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2Icon className="animate-spin w-8 h-8" />
-      </div>
-    );
-  }
-
   return (
     <div className="p-4 sm:p-8 bg-gradient-to-br from-gray-200 to-gray-100 min-h-screen">
+      {selectedEntry && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white w-full max-w-3xl max-h-[90vh] p-8 rounded-lg shadow-lg overflow-hidden">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-extrabold">{selectedEntry.templateSlug}</h2>
+              <button
+                onClick={() => setSelectedEntry(null)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="overflow-y-auto max-h-[60vh] px-4 py-6 bg-gray-100 rounded-lg font-serif text-base text-gray-900 leading-relaxed tracking-wide whitespace-pre-line">
+              {selectedEntry.aiResponse}
+            </div>
+            <div className="h-20"></div>
+            <div className="flex justify-center">
+              <Button
+                onClick={() => handleDownloadPDF(selectedEntry)}
+                className="text-sm bg-green-600 text-white hover:bg-green-700 px-6 py-3 rounded-lg"
+              >
+                Download as PDF
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="flex items-center mb-6">
         <Button
           onClick={() => router.back()}
@@ -118,23 +149,19 @@ const HistoryPage = () => {
           Back
         </Button>
       </div>
-
       <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-6 text-center">
         AI Response History
       </h1>
-
-      {/* Search Bar */}
       <div className="relative mb-6">
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => handleSearch(e.target.value)}
           placeholder="Search history..."
-          className="w-full p-2  pl-10 border border-gray-300 rounded"
+          className="w-full p-2 pl-10 border border-gray-300 rounded"
         />
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
       </div>
-
       <div className="flex flex-col gap-6">
         {currentData.length === 0 ? (
           <div className="text-center text-gray-500 col-span-full">
@@ -185,7 +212,6 @@ const HistoryPage = () => {
           ))
         )}
       </div>
-
       <div className="mt-8 flex justify-center gap-2">
         {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
           <button
