@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { db } from "@/utils/db";
 import { AIOutput } from "@/utils/schema";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon, ArrowLeft } from "lucide-react";
+import { Loader2Icon, ArrowLeft, Search } from "lucide-react";
 import { desc } from "drizzle-orm";
 import { eq } from "drizzle-orm/expressions";
 import { jsPDF } from "jspdf";
@@ -15,6 +15,7 @@ const HistoryPage = () => {
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedEntry, setSelectedEntry] = useState<any | null>(null);
   const router = useRouter();
 
@@ -53,8 +54,18 @@ const HistoryPage = () => {
     }
   };
 
-  const totalPages = Math.ceil(history.length / ITEMS_PER_PAGE);
-  const currentData = history.slice(
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+  };
+
+  const filteredHistory = history.filter((entry) =>
+    entry.templateSlug.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    entry.aiResponse.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredHistory.length / ITEMS_PER_PAGE);
+  const currentData = filteredHistory.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
@@ -63,37 +74,28 @@ const HistoryPage = () => {
     setCurrentPage(page);
   };
 
-  // Function to handle downloading the specific history entry as a PDF
   const handleDownloadPDF = (entry: any) => {
-    const doc = new jsPDF(); // Create a new jsPDF document
-
+    const doc = new jsPDF();
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
 
-    // Title
     doc.text(`AI Response History - ${entry.templateSlug}`, 10, 10);
     doc.text(`Date: ${entry.createdAt}`, 10, 20);
 
-    // Add the AI response, and ensure text wraps properly.
-    let yPos = 30; // Initial Y position for text
-
+    let yPos = 30;
     const response = entry.aiResponse;
-    const maxWidth = 180; // Maximum width before wrapping
-
-    // Split text into lines to wrap around the page
+    const maxWidth = 180;
     const lines = doc.splitTextToSize(response, maxWidth);
 
-    // Add the response lines to the PDF, adjusting for new lines
     for (let i = 0; i < lines.length; i++) {
       doc.text(lines[i], 10, yPos);
-      yPos += 8; // Increase Y position for the next line
-      if (yPos > 270) {  // Check if the content exceeds the bottom of the page
-        doc.addPage(); // Add a new page
-        yPos = 10; // Reset Y position to the top of the new page
+      yPos += 8;
+      if (yPos > 270) {
+        doc.addPage();
+        yPos = 10;
       }
     }
 
-    // Save the generated PDF with a dynamic name based on the entry
     doc.save(`${entry.templateSlug}_history.pdf`);
   };
 
@@ -121,7 +123,18 @@ const HistoryPage = () => {
         AI Response History
       </h1>
 
-      {/* Display entries in a single column for mobile and small screens */}
+      {/* Search Bar */}
+      <div className="relative mb-6">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder="Search history..."
+          className="w-full p-2  pl-10 border border-gray-300 rounded"
+        />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
+      </div>
+
       <div className="flex flex-col gap-6">
         {currentData.length === 0 ? (
           <div className="text-center text-gray-500 col-span-full">
@@ -173,7 +186,6 @@ const HistoryPage = () => {
         )}
       </div>
 
-      {/* Pagination Controls */}
       <div className="mt-8 flex justify-center gap-2">
         {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
           <button
@@ -189,33 +201,6 @@ const HistoryPage = () => {
           </button>
         ))}
       </div>
-
-      {/* Full-Screen Modal */}
-      {selectedEntry && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 sm:p-8 rounded-lg shadow-lg w-11/12 max-w-4xl h-5/6 overflow-y-auto relative">
-            <Button
-              onClick={() => setSelectedEntry(null)}
-              className="absolute top-4 right-4 text-white hover:text-gray-400"
-            >
-              Close
-            </Button>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
-              {selectedEntry.templateSlug}
-            </h2>
-            <div className="text-xs sm:text-sm text-gray-500 mb-4">{selectedEntry.createdAt}</div>
-            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm sm:text-base">
-              {selectedEntry.aiResponse}
-            </p>
-            <Button
-              onClick={() => setSelectedEntry(null)}
-              className="mt-6 bg-gray-800 text-white hover:bg-gray-700 px-4 py-2 rounded"
-            >
-              Read Less
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
