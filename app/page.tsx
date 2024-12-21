@@ -1,8 +1,9 @@
-'use client'
+'use client';
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation'; // Using the router for navigation
 import { Button } from '@/components/ui/button';
+import Image from 'next/image'; // For the logo
 
 const HomePage = () => {
   const router = useRouter();
@@ -16,30 +17,46 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-r from-gray-800 to-gray-900 text-white p-4">
-      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 text-center">
-        UG NOTES
-      </h1>
-      <p className="text-lg sm:text-xl lg:text-2xl mb-6 text-center max-w-2xl">
-        Your ultimate study companion for UG courses
-      </p>
-  
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-white via-teal-300 to-teal-500 text-black p-6">
+      {/* Logo Section */}
+      <div className="mb-6">
+        <Image src="/creativity.png" alt="UG Notes Logo" width={120} height={120} priority />
+      </div>
+
+      {/* Title Section */}
+      <div className="text-center">
+        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4">
+          UG NOTES
+        </h1>
+        <p className="text-lg sm:text-xl lg:text-2xl mb-8 max-w-xl mx-auto">
+          Your ultimate study companion for UG courses. Learn better, faster, and smarter.
+        </p>
+      </div>
+
+      {/* Action Button */}
       <Button
         onClick={handleGetStarted}
         className={`${
-          loading ? "bg-gray-600" : "bg-yellow-500 hover:bg-yellow-600"
-        } text-black px-6 py-3 rounded-full text-lg font-semibold transition duration-300 flex items-center justify-center`}
+          loading ? 'bg-opacity-50 cursor-not-allowed' : 'bg-yellow-400 hover:bg-yellow-500'
+        } px-8 py-4 rounded-full text-lg font-bold text-black shadow-lg transform transition-all duration-300 hover:scale-105`}
         disabled={loading} // Disable button while loading
       >
         {loading ? (
-          <div className="w-5 h-5 border-4 border-t-4 border-black rounded-full animate-spin"></div> // Loading spinner
+          <div className="flex items-center justify-center">
+            <div className="w-5 h-5 border-4 border-t-4 border-black rounded-full animate-spin mr-2"></div>
+            <span>Loading...</span>
+          </div>
         ) : (
-          "Get Started"
+          'Get Started'
         )}
       </Button>
+
+      {/* Footer Section */}
+      <footer className="absolute bottom-6 text-sm text-teal-800">
+         2024@Startstreams All Rights Are Reserved.
+      </footer>
     </div>
   );
-  
 };
 
 export default HomePage;

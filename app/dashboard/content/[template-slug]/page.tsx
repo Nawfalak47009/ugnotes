@@ -29,7 +29,7 @@ function CreateNewContent(props: PROPS) {
     );
 
     const [loading, setLoading] = useState(false);
-    const [aiOutput, setAIOutput] = useState<string>("");
+    const [aiOutput, setAIOutput] = useState<string>(""); 
     const { user } = useUser(); // Get current user data
 
     const GenerateAIContent = async (formData: any) => {
@@ -86,12 +86,11 @@ function CreateNewContent(props: PROPS) {
             console.error("Error saving to database:", error);
         }
     };
-    
 
     return (
-        <div className="p-10">
+        <div className="p-10 bg-gradient-to-r from-teal-400 to-teal-600 min-h-screen">
             <Link href={"/dashboard"}>
-                <Button>
+                <Button className="bg-black hover:bg-gray-600 text-white">
                     <ArrowLeft />
                     Back
                 </Button>
@@ -103,7 +102,7 @@ function CreateNewContent(props: PROPS) {
                     loading={loading}
                 />
 
-                <div className="col-span-2">
+                <div className="col-span-2 bg-white rounded-lg shadow-xl p-5">
                     <OutputSection aiOutput={aiOutput} />
                 </div>
             </div>

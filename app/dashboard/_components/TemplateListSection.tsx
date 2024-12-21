@@ -19,38 +19,29 @@ export interface FORM {
     required?: boolean;
 }
 
-function TemplateListSection({userSearchInput}:any) {
-    
-    const [templateList,setTemplateList]=useState(Templates)
-    useEffect(()=>{
+function TemplateListSection({userSearchInput}: any) {
+    const [templateList, setTemplateList] = useState(Templates);
 
-      if(userSearchInput)
-      {
-        const filterData=Templates.filter(item=>
-            item.name.toLowerCase().includes(userSearchInput.toLowerCase())
-        );
-        setTemplateList(filterData);
-      }
-      else{
-        setTemplateList(Templates);
-      }
-    },[userSearchInput])
-    // Debugging: Log slugs to check for duplicates
-    console.log(
-        Templates.map((item) => item.slug),
-        'Template slugs'
-    );
+    useEffect(() => {
+        if (userSearchInput) {
+            const filterData = Templates.filter(item =>
+                item.name.toLowerCase().includes(userSearchInput.toLowerCase())
+            );
+            setTemplateList(filterData);
+        } else {
+            setTemplateList(Templates);
+        }
+    }, [userSearchInput]);
 
-    // Render the list with unique keys
     return (
-        <div className='grid grid-cols-2  md:grid-cols-3 lg:grid-cols-4 gap-5 p-10'>
-            {templateList.map((item: TEMPLATE, index: number) => (
-                <TemplateCard {...item} key={`${item.slug}-${index}`} />
-            ))}
+        <div className="p-8 bg-gradient-to-br from-teal-100 to-teal-300">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {templateList.map((item: TEMPLATE, index: number) => (
+                    <TemplateCard {...item} key={`${item.slug}-${index}`} />
+                ))}
+            </div>
         </div>
     );
 }
 
 export default TemplateListSection;
-
-
