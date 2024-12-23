@@ -25,7 +25,7 @@ function Layout({
       {/* Mobile Menu Button */}
       <button
         onClick={toggleSideNav}
-        className="md:hidden fixed top-4 left-4 z-50 bg-teal-700 text-white p-3 rounded-full shadow-lg transition-transform duration-300 hover:scale-105"
+        className="md:hidden fixed top-4 left-4 z-50 bg-blue-500 text-white p-3 rounded-full shadow-lg transition-transform duration-300 hover:scale-105"
         aria-label="Toggle Menu"
       >
         {isSideNavOpen ? "✕" : "☰"} {/* Cross or Hamburger icon */}

@@ -28,9 +28,9 @@ function FormSection({ selectedTemplate, userFormInput, loading }: PROPS) {
     };
 
     return (
-        <div className="p-5 shadow-lg border-2 border-teal-600 bg-teal-50 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-10  hover:border-teal-400 hover:shadow-[0_0_15px_4px_#10b981]">
+        <div className="p-5 shadow-lg border-2 border-blue-400 bg-white rounded-lg transition-all duration-300 ease-in-out transform hover:scale-10  hover:border-blue-600 hover:shadow-[0_0_15px_4px_#2832c2]">
             {/* @ts-ignore */}
-            <Image src={selectedTemplate?.icon || "/default-icon.png"} alt="icon" width={80} height={80} className="rounded-full border-4 border-teal-600 p-2" />
+            <Image src={selectedTemplate?.icon || "/default-icon.png"} alt="icon" width={80} height={80} className="rounded-full border-4 border-blue-500 p-2" />
             <h2 className="font-bold text-2xl mb-2">{selectedTemplate?.name}</h2>
             <p className="text-gray-500 text-sm">{selectedTemplate?.desc}</p>
 
@@ -41,18 +41,18 @@ function FormSection({ selectedTemplate, userFormInput, loading }: PROPS) {
                         {item.field == "input" ?
                             <Input name={item.name} required={item?.required}
                                 onChange={handleInputChange}
-                                className="border-2 border-teal-300 focus:outline-none focus:ring-2 focus:ring-teal-500 p-4 rounded-lg"
+                                className="border-2 border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 p-4 rounded-lg"
                             />
                             : item.field == "textarea" ?
                                 <Textarea name={item.name} required={item?.required}
                                     onChange={handleInputChange}
-                                    className="border-2 border-teal-300 focus:outline-none focus:ring-2 focus:ring-teal-500 p-4 rounded-lg"
+                                    className="border-2 border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 p-4 rounded-lg"
                                 />
                                 : null
                         }
                     </div>
                 ))}
-                <Button type="submit" className="w-full py-6 bg-teal-600 text-white hover:bg-teal-700 focus:outline-none rounded-lg shadow-lg transition-all ease-in-out"
+                <Button type="submit" className="w-full py-6 bg-blue-600 text-white hover:bg-blue-700 focus:outline-none rounded-lg shadow-lg transition-all ease-in-out"
                     disabled={loading}>
                     {loading && <Loader2Icon className="animate-spin mr-2" />}
                     Generate Content

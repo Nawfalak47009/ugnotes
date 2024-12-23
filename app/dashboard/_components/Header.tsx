@@ -5,7 +5,7 @@ function Header() {
   const { user } = useUser(); // Access user data using Clerk's useUser hook
 
   return (
-    <div className='p-5 shadow-xl bg-gradient-to-br from-teal-100 to-teal-400 border-b-2 flex justify-between items-center'>
+    <div className='p-5 shadow-xl bg-gradient-to-br bg-white border-b-2 flex justify-between items-center'>
       <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-800 tracking-wide">
         Hi {user?.fullName} 😄
       </h1>

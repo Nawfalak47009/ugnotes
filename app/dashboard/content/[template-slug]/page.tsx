@@ -88,7 +88,7 @@ function CreateNewContent(props: PROPS) {
     };
 
     return (
-        <div className="p-10 bg-gradient-to-r from-teal-400 to-teal-600 min-h-screen">
+        <div className="p-10 bg-gradient-to-r from-blue-200 to-blue-300 min-h-screen">
             <Link href={"/dashboard"}>
                 <Button className="bg-black hover:bg-gray-600 text-white">
                     <ArrowLeft />

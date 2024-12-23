@@ -17,7 +17,7 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-white via-teal-300 to-teal-500 text-black p-6">
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-300 via-blue-400 to-blue-500 text-black p-6">
       {/* Logo Section */}
       <div className="mb-6">
         <Image src="/creativity.png" alt="UG Notes Logo" width={120} height={120} priority />

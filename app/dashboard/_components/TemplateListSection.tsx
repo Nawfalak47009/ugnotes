@@ -34,7 +34,7 @@ function TemplateListSection({userSearchInput}: any) {
     }, [userSearchInput]);
 
     return (
-        <div className="p-8 bg-gradient-to-br from-teal-100 to-teal-300">
+        <div className="p-8 bg-gradient-to-br bg-white">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                 {templateList.map((item: TEMPLATE, index: number) => (
                     <TemplateCard {...item} key={`${item.slug}-${index}`} />

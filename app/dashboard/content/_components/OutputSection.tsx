@@ -30,10 +30,10 @@ function OutputSection({ aiOutput }: Props) {
   };
 
   return (
-    <div className='p-5 bg-white shadow-lg rounded-xl border-2 border-teal-500 hover:border-teal-600 transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-[0_0_15px_6px_#10b981]'>
+    <div className='p-5 bg-white shadow-lg rounded-xl border-2 border-blue-400 hover:border-blue-500 transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-[0_0_15px_6px_#2832c2]'>
       <div className='flex justify-between items-center p-5'>
         <h2 className='font-medium text-lg text-gray-800'>Your Result</h2>
-        <Button className='flex gap-2 text-teal-500 hover:text-teal-600' onClick={handleCopy}>
+        <Button className='flex gap-2 text-blue-400 hover:text-blue-600' onClick={handleCopy}>
           <Copy className='w-4 h-4' /> Copy
         </Button>
       </div>

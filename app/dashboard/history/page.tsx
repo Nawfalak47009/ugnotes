@@ -148,10 +148,10 @@ const HistoryPage = () => {
   };
 
   return (
-    <div className="p-6 sm:p-12 bg-gradient-to-br from-teal-100 to-teal-400 min-h-screen">
+    <div className="p-6 sm:p-12 bg-gradient-to-br bg-white min-h-screen">
       {/* Notification Display */}
       {notification && (
-        <div className="fixed top-5 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-xl shadow-green-400 transition-all">
+        <div className="fixed top-5 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-6 py-3 rounded-lg shadow-xl shadow-blue-400 transition-all">
           {notification}
         </div>
       )}
@@ -161,7 +161,7 @@ const HistoryPage = () => {
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center transition-all">
           <div className="bg-white w-full max-w-3xl max-h-[90vh] p-8 rounded-lg shadow-xl overflow-hidden transition-all">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-teal-600">Edit AI Response</h2>
+              <h2 className="text-2xl font-bold text-blue-400">Edit AI Response</h2>
               <button
                 onClick={() => setEditEntry(null)}
                 className="text-gray-600 hover:text-gray-700"
@@ -170,7 +170,7 @@ const HistoryPage = () => {
               </button>
             </div>
             <textarea
-              className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={10}
               value={editedResponse}
               onChange={(e) => setEditedResponse(e.target.value)}
@@ -178,7 +178,7 @@ const HistoryPage = () => {
             <div className="mt-4 flex justify-end gap-4">
               <Button
                 onClick={handleSaveEdit}
-                className="bg-teal-600 text-white hover:bg-teal-700 px-6 py-2 rounded-lg shadow-md transition-all"
+                className="bg-blue-600 text-white hover:bg-blue-700 px-6 py-2 rounded-lg shadow-md transition-all"
               >
                 Save Changes
               </Button>
@@ -198,7 +198,7 @@ const HistoryPage = () => {
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center transition-all">
           <div className="bg-white w-full max-w-3xl max-h-[90vh] p-8 rounded-lg shadow-xl overflow-hidden transition-all">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-teal-600">{selectedEntry.templateSlug}</h2>
+              <h2 className="text-2xl font-bold text-blue-600">{selectedEntry.templateSlug}</h2>
               <button
                 onClick={() => setSelectedEntry(null)}
                 className="text-gray-600 hover:text-gray-700"
@@ -212,7 +212,7 @@ const HistoryPage = () => {
             <div className="flex justify-center mt-6">
               <Button
                 onClick={() => handleDownloadPDF(selectedEntry)}
-                className="bg-teal-600 text-white hover:bg-teal-700 px-6 py-2 rounded-lg shadow-md transition-all"
+                className="bg-blue-700 text-white hover:bg-blue-400 px-6 py-2 rounded-lg shadow-md transition-all"
               >
                 Download PDF
               </Button>
@@ -231,7 +231,7 @@ const HistoryPage = () => {
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
               placeholder="Search your history..."
-              className="p-3 border border-teal-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all w-full sm:w-auto"
+              className="p-3 border border-blue-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all w-full sm:w-auto"
             />
           </div>
         </div>
@@ -240,7 +240,7 @@ const HistoryPage = () => {
       <div className="space-y-8">
         {loading ? (
           <div className="flex justify-center">
-            <Loader2Icon className="w-8 h-8 animate-spin text-teal-500" />
+            <Loader2Icon className="w-8 h-8 animate-spin text-blue-500" />
           </div>
         ) : currentData.length > 0 ? (
           currentData.map((entry) => (
@@ -249,12 +249,12 @@ const HistoryPage = () => {
               className="flex flex-col bg-white p-6 rounded-lg shadow-xl space-y-6 transition-all hover:shadow-2xl hover:scale-105"
             >
               <div className="flex justify-between items-center">
-                <h3 className="text-xl font-semibold text-teal-700">{entry.templateSlug}</h3>
+                <h3 className="text-xl font-semibold text-blue-700">{entry.templateSlug}</h3>
                 <div className="space-x-3 flex-wrap sm:flex-nowrap">
                   <Button
                     variant="outline"
                     onClick={() => handleCopy(entry.aiResponse)}
-                    className="bg-teal-600 hover:bg-teal-700 text-white py-2 px-6 rounded-lg transition-all"
+                    className="bg-blue-700 hover:bg-blue-600 text-white py-2 px-6 rounded-lg transition-all"
                   >
                     Copy
                   </Button>
@@ -283,7 +283,7 @@ const HistoryPage = () => {
               <p className="text-sm text-gray-600">{entry.aiResponse.slice(0, 150)}...</p>
               <Button
                 variant="link"
-                className="text-sm text-teal-500 hover:text-teal-700"
+                className="text-sm text-blue-400 hover:text-blue-700 transition-colors duration-300 ease-in-out transform hover:scale-105 active:scale-95"
                 onClick={() => setSelectedEntry(entry)}
               >
                 Read More
