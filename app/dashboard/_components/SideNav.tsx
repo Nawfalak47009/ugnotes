@@ -1,12 +1,18 @@
 "use client";
-import { FileClock, Home, Settings, WalletCards, Heart } from 'lucide-react';
+import { FileClock, Home, Settings, MessageCircle } from 'lucide-react';
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation'; // useRouter to programmatically navigate
+import { usePathname } from 'next/navigation'; // usePathname to get current route
 import React, { useEffect } from 'react';
 import Link from 'next/link'; // Use Link component for navigation
 
-function SideNav() {
-    const MenuList = [
+type MenuItem = {
+    name: string;
+    icon: React.ElementType;
+    path: string;
+};
+
+const SideNav: React.FC = () => {
+    const MenuList: MenuItem[] = [
         {
             name: 'Home',
             icon: Home,
@@ -20,13 +26,13 @@ function SideNav() {
         {
             name: 'Settings',
             icon: Settings,
-            path: '/dashboard/settings' // Ensure this is the correct path
-        },
+            path: '/dashboard/settings'
+        }
+       
     ];
 
     const path = usePathname(); // Get the current path
-    const router = useRouter(); // Access router for programmatic navigation
-    
+
     useEffect(() => {
         console.log(path); // You can remove this after debugging
     }, [path]);
@@ -51,7 +57,6 @@ function SideNav() {
                     </Link>
                 ))}
             </div>
-
         </div>
     );
 }

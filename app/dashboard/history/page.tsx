@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { db } from "@/utils/db";
 import { AIOutput } from "@/utils/schema";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon, ArrowLeft, Search, X, Edit } from "lucide-react";
+import { Loader2Icon, ArrowLeft, Search, X, Edit, Share2 } from "lucide-react";
 import { desc } from "drizzle-orm";
 import { eq } from "drizzle-orm/expressions";
 import { jsPDF } from "jspdf";
@@ -147,6 +147,21 @@ const HistoryPage = () => {
     setTimeout(() => setNotification(null), 3000); // Hide after 3 seconds
   };
 
+  const handleShare = (entry: any) => {
+    const subject = `Check out this AI response: ${entry.templateSlug}`;
+    const body = `Check out this AI response:\n\n${entry.aiResponse}\n\nMore details: ${window.location.href}`;
+
+    // Create a mailto link to share via Gmail (or the default email client)
+    const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    // Open the email draft in the user's default email client (like Gmail or Outlook)
+    window.open(mailtoLink, "_blank");
+
+    setNotification("Shared successfully via email!");
+    setTimeout(() => setNotification(null), 3000); // Hide after 3 seconds
+  };
+
+
   return (
     <div className="p-6 sm:p-12 bg-gradient-to-br bg-white min-h-screen">
       {/* Notification Display */}
@@ -278,6 +293,12 @@ const HistoryPage = () => {
                   >
                     Download PDF
                   </Button>
+                  <Button
+                    onClick={() => handleShare(entry)} // Add the share functionality
+                    className="bg-slate-500 text-white hover:bg-slate-600 py-2 px-6 rounded-lg transition-all"
+                  >
+                    <Share2 className="w-5 h-5" />
+                  </Button>
                 </div>
               </div>
               <p className="text-sm text-gray-600">{entry.aiResponse.slice(0, 150)}...</p>
@@ -304,11 +325,10 @@ const HistoryPage = () => {
                 <li key={idx}>
                   <button
                     onClick={() => handlePageChange(idx + 1)}
-                    className={`${
-                      currentPage === idx + 1
+                    className={`${currentPage === idx + 1
                         ? "bg-teal-600 text-white"
                         : "bg-gray-200 text-gray-700"
-                    } py-2 px-6 rounded-lg transition-all hover:bg-teal-700`}
+                      } py-2 px-6 rounded-lg transition-all hover:bg-teal-700`}
                   >
                     {idx + 1}
                   </button>
