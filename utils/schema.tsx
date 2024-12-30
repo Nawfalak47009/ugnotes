@@ -1,4 +1,4 @@
-import { pgTable, serial, text, varchar, } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, varchar, timestamp } from "drizzle-orm/pg-core";
 
 export const AIOutput = pgTable('aiOutput', {
   id: serial('id').primaryKey(),
@@ -6,7 +6,16 @@ export const AIOutput = pgTable('aiOutput', {
   aiResponse: text('aiResponse'),
   templateSlug: varchar('template-slug').notNull(),
   createdBy: varchar('createdBy').notNull(),
-  createdAt: varchar('createdAt'),
-  userId: varchar('userId').notNull(),  // Set a default value for userId
+  createdAt: timestamp('createdAt').defaultNow(), // Changed to timestamp with defaultNow()
+  userId: varchar('userId').notNull(),
 });
 
+export const Notes = pgTable('notes', {
+  id: serial('id').primaryKey(),
+  noteContent: text('noteContent').notNull(),
+  organizationId: varchar('organizationId').notNull(),
+  createdAt: timestamp('createdAt').defaultNow(),
+  createdBy: varchar('createdBy').notNull(),
+  userId: varchar('userId').notNull(),
+  
+});

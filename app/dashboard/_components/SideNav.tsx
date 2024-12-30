@@ -1,5 +1,5 @@
 "use client";
-import { FileClock, Home, Settings, MessageCircle } from 'lucide-react';
+import { Calculator, FileClock, FolderCheckIcon, Home, Settings, Users } from 'lucide-react'; // Add the Users icon
 import Image from 'next/image';
 import { usePathname } from 'next/navigation'; // usePathname to get current route
 import React, { useEffect } from 'react';
@@ -24,11 +24,20 @@ const SideNav: React.FC = () => {
             path: '/dashboard/history'
         },
         {
+            name: 'Organization',
+            icon: Users,
+            path: '/dashboard/organization' // New path for Organization
+        },
+        {
+            name: 'Calculator',
+            icon: Calculator,
+            path: '/dashboard/calculator' // New path for Organization
+        },
+        {
             name: 'Settings',
             icon: Settings,
             path: '/dashboard/settings'
         }
-       
     ];
 
     const path = usePathname(); // Get the current path
