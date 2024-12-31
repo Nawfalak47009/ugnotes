@@ -1,3 +1,4 @@
+"use-client";
 import { useAuth } from "@clerk/nextjs"; // Import useAuth from Clerk
 import { useEffect, useState } from "react";
 import { db } from "../../../utils/db"; // Adjust this according to your file structure
