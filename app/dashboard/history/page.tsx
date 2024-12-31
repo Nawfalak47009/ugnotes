@@ -1,10 +1,10 @@
-"use-client";
+"use client";
 import { useAuth } from "@clerk/nextjs"; // Import useAuth from Clerk
 import { useEffect, useState } from "react";
 import { db } from "../../../utils/db"; // Adjust this according to your file structure
 import { Notes } from "../../../utils/schema"; // Correct path to your Notes table definition
 import { eq } from "drizzle-orm"; // Import eq from drizzle-orm for proper comparisons
-import axios from 'axios';
+
 
 const NotesPage = () => {
     const { userId } = useAuth(); // Use useAuth to get the current authenticated user's ID
