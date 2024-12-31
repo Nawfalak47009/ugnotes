@@ -1,289 +1,337 @@
 "use client";
-import { useAuth } from "@clerk/nextjs"; // Import useAuth from Clerk
-import { useEffect, useState } from "react";
-import { db } from "../../../utils/db"; // Adjust this according to your file structure
-import { Notes } from "../../../utils/schema"; // Correct path to your Notes table definition
-import { eq } from "drizzle-orm"; // Import eq from drizzle-orm for proper comparisons
+import React, { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { db } from "@/utils/db";
+import { AIOutput } from "@/utils/schema";
+import { Button } from "@/components/ui/button";
+import { Loader2Icon, ArrowLeft, Search, X, Edit, Mail } from "lucide-react";
+import { desc } from "drizzle-orm";
+import { eq } from "drizzle-orm/expressions";
+import { jsPDF } from "jspdf";
+import { useAuth } from "@clerk/nextjs";
 
+const ITEMS_PER_PAGE = 8;
 
-const NotesPage = () => {
-    const { userId } = useAuth(); // Use useAuth to get the current authenticated user's ID
-    const [notes, setNotes] = useState<any[]>([]); // Adjust type based on your schema
-    const [noteContent, setNoteContent] = useState<string>(""); // For capturing note input
-    const [loading, setLoading] = useState<boolean>(true); // For loading state
-    const [fontStyle, setFontStyle] = useState<string>("Arial"); // Track font family
-    const [fontSize, setFontSize] = useState<string>("16px"); // Track font size
-    const [fontColor, setFontColor] = useState<string>("#000000"); // Track text color
-    const [fontWeight, setFontWeight] = useState<string>("normal"); // Track font weight
-    const [enteredCode, setEnteredCode] = useState<string>(""); // State for the entered code
-    const [isCodeCorrect, setIsCodeCorrect] = useState<boolean>(false); // Flag to check if the code is correct
+const HistoryPage = () => {
+  const [history, setHistory] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedEntry, setSelectedEntry] = useState<any | null>(null);
+  const [editEntry, setEditEntry] = useState<any | null>(null);
+  const [editedResponse, setEditedResponse] = useState("");
+  const [notification, setNotification] = useState<string | null>(null);
+  const router = useRouter();
+  const { userId } = useAuth();
 
-    const currentYear = new Date().getFullYear(); // Get current year
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (!userId) return;
 
-    useEffect(() => {
-        if (userId) {
-            // Fetch notes when the page loads
-            fetchNotes();
-        }
-    }, [userId]); // Re-fetch notes when the userId changes or page mounts
+      const stringUserId = userId;
 
-    // Function to fetch notes from the database
-    const fetchNotes = async () => {
-        setLoading(true);
-        try {
-            // Ensure that we fetch only notes related to the authenticated user
-            if (userId) {
-                const fetchedNotes = await db
-                    .select()
-                    .from(Notes)
-                    .where(eq(Notes.userId, userId)) // Fetch notes for the authenticated user
-                    .execute();
-                setNotes(fetchedNotes);
-            } else {
-                console.error("User ID is undefined");
-            }
-        } catch (error) {
-            console.error("Error fetching notes:", error);
-        } finally {
-            setLoading(false);
-        }
+      setLoading(true);
+      try {
+        const result = await db
+          .select()
+          .from(AIOutput)
+          .where(eq(AIOutput.userId, stringUserId))
+          .orderBy(desc(AIOutput.createdAt));
+
+        setHistory(result);
+      } catch (error) {
+        console.error("Error fetching history:", error);
+      }
+      setLoading(false);
     };
 
-    // Function to handle new note creation
-    const handleAddNote = async () => {
-        if (!noteContent.trim()) {
-            alert("Please enter some note content!");
-            return;
-        }
+    if (userId) fetchHistory();
+  }, [userId]);
 
-        try {
-            if (userId) {
-                // Insert the note into the database with userId, title, and content
-                await db.insert(Notes).values({
-                    userId: userId, // Use the userId from Clerk
-                    title: "Untitled Note",  // Default title or dynamically set title
-                    content: noteContent, // Content of the note
-                    createdAt: new Date(), // Automatically generated timestamp (default set in schema)
-                }).execute();
+  const handleCopy = (aiResponse: string) => {
+    navigator.clipboard
+      .writeText(aiResponse)
+      .then(() => {
+        setNotification("AI Response copied to clipboard!");
+        setTimeout(() => setNotification(null), 3000);
+      })
+      .catch((err) => {
+        console.error("Error copying text:", err);
+      });
+  };
 
-                setNoteContent(""); // Reset note content after adding
-                fetchNotes(); // Re-fetch notes to include the newly added one
-            }
-        } catch (error) {
-            console.error("Error adding note:", error);
-        }
-    };
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this history entry?")) {
+      try {
+        await db.delete(AIOutput).where(eq(AIOutput.id, id));
+        setHistory(history.filter((entry) => entry.id !== id));
+        setNotification("History entry deleted successfully!");
+        setTimeout(() => setNotification(null), 3000);
+      } catch (error) {
+        console.error("Error deleting history entry:", error);
+      }
+    }
+  };
 
-    // Function to handle note deletion
-    const handleDeleteNote = async (noteId: string) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this note?");
-        if (confirmDelete) {
-            try {
-                // Convert noteId to a number before passing to eq
-                await db.delete(Notes).where(eq(Notes.id, Number(noteId))).execute();
-                fetchNotes(); // Re-fetch the notes after deletion
-            } catch (error) {
-                console.error("Error deleting note:", error);
-            }
-        }
-    };
+  const handleEdit = (entry: any) => {
+    setEditEntry(entry);
+    setEditedResponse(entry.aiResponse);
+  };
 
-    // Function to handle code verification
-    const handleCodeSubmit = () => {
-        if (enteredCode === "4543") {
-            setIsCodeCorrect(true); // Unlock the page if code is correct
-        } else {
-            alert("Incorrect code! Please try again.");
-        }
-    };
+  const handleSaveEdit = async () => {
+    if (!editEntry) return;
 
-    if (!isCodeCorrect) {
-        return (
-            <div style={{ maxWidth: "400px", margin: "auto", padding: "20px", textAlign: "center" }}>
-                <h1
-                    style={{
-                        fontSize: "32px",
-                        fontWeight: "700",
-                        color: "#333",
-                        textAlign: "center",
-                        marginBottom: "20px",
-                        textTransform: "uppercase",
-                        letterSpacing: "2px",
-                        fontFamily: "'Roboto', sans-serif",
-                        textShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                    }}
-                >
-                    Enter Access Code
-                </h1>
+    try {
+      await db.update(AIOutput)
+        .set({ aiResponse: editedResponse })
+        .where(eq(AIOutput.id, editEntry.id));
 
-                <input
-                    type="text"
-                    value={enteredCode}
-                    onChange={(e) => setEnteredCode(e.target.value)}
-                    placeholder="Enter 4-digit code"
-                    style={{
-                        padding: "12px 16px",
-                        fontSize: "18px",
-                        marginBottom: "15px",
-                        width: "100%",
-                        borderRadius: "8px",
-                        border: "2px solid #ccc",
-                        backgroundColor: "#f4f4f4",
-                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                        outline: "none",
-                        transition: "border-color 0.3s ease, box-shadow 0.3s ease",
-                    }}
-                    onFocus={(e) => e.target.style.borderColor = "#4CAF50"}
-                    onBlur={(e) => e.target.style.borderColor = "#ccc"}
-                />
-                <button
-                    onClick={handleCodeSubmit}
-                    style={{
-                        backgroundColor: "#4CAF50",
-                        color: "#fff",
-                        padding: "10px 20px",
-                        borderRadius: "5px",
-                        border: "none",
-                        cursor: "pointer",
-                        fontSize: "16px",
-                        marginTop: "10px",
-                    }}
-                >
-                    Submit
-                </button>
-            </div>
-        );
+      setHistory(
+        history.map((entry) =>
+          entry.id === editEntry.id ? { ...entry, aiResponse: editedResponse } : entry
+        )
+      );
+      setNotification("History entry updated successfully!");
+      setTimeout(() => setNotification(null), 3000);
+      setEditEntry(null);
+    } catch (error) {
+      console.error("Error saving edit:", error);
+    }
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+  };
+
+  const filteredHistory = useMemo(() =>
+    history.filter((entry) =>
+      entry.templateSlug.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      entry.aiResponse.toLowerCase().includes(searchQuery.toLowerCase())
+    ), [history, searchQuery]);
+
+  const totalPages = Math.ceil(filteredHistory.length / ITEMS_PER_PAGE);
+  const currentData = useMemo(() => filteredHistory.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  ), [filteredHistory, currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleDownloadPDF = (entry: any) => {
+    const doc = new jsPDF();
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+
+    doc.text(`AI Response History - ${entry.templateSlug}`, 10, 10);
+    doc.text(`Date: ${entry.createdAt}`, 10, 20);
+
+    let yPos = 30;
+    const response = entry.aiResponse;
+    const maxWidth = 180;
+    const lines = doc.splitTextToSize(response, maxWidth);
+
+    for (let i = 0; i < lines.length; i++) {
+      doc.text(lines[i], 10, yPos);
+      yPos += 8;
+      if (yPos > 270) {
+        doc.addPage();
+        yPos = 10;
+      }
     }
 
-    return (
-        <div style={{ maxWidth: "960px", margin: "auto", padding: "20px", fontFamily: "'Courier New', monospace", backgroundColor: "#f9f9f9" }}>
-            <h1 style={{ textAlign: "center", color: "#333", fontSize: "32px", fontWeight: "700", marginBottom: "20px", textTransform: "uppercase" }}>
-                Notes ({currentYear})
-            </h1>
+    doc.save(`${entry.templateSlug}_history.pdf`);
+    setNotification("Download started!");
+    setTimeout(() => setNotification(null), 3000);
+  };
 
-            {/* Note style toolbar */}
-            <div style={{ marginBottom: "20px", display: "flex", justifyContent: "space-between", flexWrap: "wrap" }}>
-                {/* Font Style Selector */}
-                <select value={fontStyle} onChange={(e) => setFontStyle(e.target.value)} style={{ padding: "8px", fontSize: "14px", marginBottom: "10px", flex: "1" }}>
-                    <option value="Arial">Arial</option>
-                    <option value="Courier New">Courier New</option>
-                    <option value="Georgia">Georgia</option>
-                    <option value="Times New Roman">Times New Roman</option>
-                    <option value="Verdana">Verdana</option>
-                </select>
+  const handleShare = (entry: any) => {
+    const subject = `AI Response History - ${entry.templateSlug}`;
+    const body = `Here is the AI response for ${entry.templateSlug}:\n\n${entry.aiResponse}`;
+    const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
-                {/* Font Size Selector */}
-                <select value={fontSize} onChange={(e) => setFontSize(e.target.value)} style={{ padding: "8px", fontSize: "14px", marginBottom: "10px", flex: "1" }}>
-                    <option value="14px">14px</option>
-                    <option value="16px">16px</option>
-                    <option value="18px">18px</option>
-                    <option value="20px">20px</option>
-                    <option value="24px">24px</option>
-                </select>
+    window.location.href = mailtoLink;
+  };
 
-                {/* Text Color Selector */}
-                <input
-                    type="color"
-                    value={fontColor}
-                    onChange={(e) => setFontColor(e.target.value)}
-                    style={{ padding: "5px", cursor: "pointer", marginBottom: "10px", flex: "1" }}
-                />
-
-                {/* Font Weight Selector */}
-                <select value={fontWeight} onChange={(e) => setFontWeight(e.target.value)} style={{ padding: "8px", fontSize: "14px", marginBottom: "10px", flex: "1" }}>
-                    <option value="normal">Normal</option>
-                    <option value="bold">Bold</option>
-                    <option value="medium">Medium</option>
-                </select>
-            </div>
-
-            {/* Note creation form */}
-            <div style={{ backgroundColor: "#fff", borderRadius: "12px", padding: "20px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)", marginBottom: "30px", border: "1px solid #ddd", fontFamily: fontStyle }}>
-                <textarea
-                    value={noteContent}
-                    onChange={(e) => setNoteContent(e.target.value)}
-                    placeholder="Write your note here..."
-                    style={{
-                        width: "100%",
-                        height: "200px",
-                        padding: "10px",
-                        fontSize: fontSize,
-                        color: fontColor,
-                        fontWeight: fontWeight,
-                        border: "1px solid #ddd",
-                        borderRadius: "8px",
-                        outline: "none",
-                        resize: "none",
-                        fontFamily: fontStyle,
-                    }}
-                />
-                <button
-                    onClick={handleAddNote}
-                    style={{
-                        backgroundColor: "#4CAF50",
-                        color: "#fff",
-                        padding: "10px 20px",
-                        borderRadius: "5px",
-                        border: "none",
-                        cursor: "pointer",
-                        fontSize: "16px",
-                        marginTop: "10px",
-                    }}
-                >
-                    Add Note
-                </button>
-            </div>
-
-            {/* Notes Display */}
-            {loading ? (
-                <p>Loading...</p>
-            ) : (
-                notes.length > 0 ? (
-                    <ul style={{ listStyleType: "none", padding: "0" }}>
-                        {notes.map((note) => (
-                            <li
-                                key={note.id}
-                                style={{
-                                    backgroundColor: "#fff",
-                                    marginBottom: "20px",
-                                    borderRadius: "12px",
-                                    padding: "20px",
-                                    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                                    border: "1px solid #ddd",
-                                    fontFamily: fontStyle,
-                                    fontSize: fontSize,
-                                    color: fontColor,
-                                    fontWeight: fontWeight,
-                                }}
-                            >
-                                <h2 style={{ fontSize: "20px", fontWeight: "700", marginBottom: "10px" }}>
-                                    {note.title}
-                                </h2>
-                                <p>{note.content}</p>
-                                <button
-                                    onClick={() => handleDeleteNote(note.id)}
-                                    style={{
-                                        backgroundColor: "#ff4d4d",
-                                        color: "#fff",
-                                        padding: "5px 15px",
-                                        borderRadius: "5px",
-                                        border: "none",
-                                        cursor: "pointer",
-                                        fontSize: "14px",
-                                        marginTop: "10px",
-                                    }}
-                                >
-                                    Delete
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>No notes found</p>
-                )
-            )}
+  return (
+    <div className="p-6 sm:p-12 bg-gradient-to-br bg-white min-h-screen">
+      {notification && (
+        <div className="fixed top-5 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-6 py-3 rounded-lg shadow-xl shadow-blue-400 transition-all">
+          {notification}
         </div>
-    );
+      )}
+
+      {editEntry && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center transition-all">
+          <div className="bg-white w-full max-w-3xl max-h-[90vh] p-8 rounded-lg shadow-xl overflow-hidden transition-all">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-blue-400">Edit AI Response</h2>
+              <button
+                onClick={() => setEditEntry(null)}
+                className="text-gray-600 hover:text-gray-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <textarea
+              className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={10}
+              value={editedResponse}
+              onChange={(e) => setEditedResponse(e.target.value)}
+            />
+            <div className="mt-4 flex justify-end gap-4">
+              <Button
+                onClick={handleSaveEdit}
+                className="bg-blue-600 text-white hover:bg-blue-700 px-6 py-2 rounded-lg shadow-md transition-all"
+              >
+                Save Changes
+              </Button>
+              <Button
+                onClick={() => setEditEntry(null)}
+                className="bg-gray-400 text-white hover:bg-gray-500 px-6 py-2 rounded-lg shadow-md transition-all"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedEntry && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center transition-all">
+          <div className="bg-white w-full max-w-3xl max-h-[90vh] p-8 rounded-lg shadow-xl overflow-hidden transition-all">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-blue-600">{selectedEntry.templateSlug}</h2>
+              <button
+                onClick={() => setSelectedEntry(null)}
+                className="text-gray-600 hover:text-gray-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="overflow-y-auto max-h-[60vh] px-4 py-6 bg-gray-100 rounded-lg font-serif text-base text-gray-900 leading-relaxed tracking-wide whitespace-pre-line">
+              {selectedEntry.aiResponse}
+            </div>
+            <div className="flex justify-center mt-6">
+              <Button
+                onClick={() => handleDownloadPDF(selectedEntry)}
+                className="bg-blue-700 text-white hover:bg-blue-400 px-6 py-2 rounded-lg shadow-md transition-all"
+              >
+                Download PDF
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
+        <h1 className="text-3xl font-extrabold text-gray-800">Your history</h1>
+        <div className="flex items-center space-x-4 mt-4 sm:mt-0">
+          <div className="flex items-center space-x-2">
+            <Search className="w-5 h-5 text-gray-600" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              placeholder="Search your history..."
+              className="p-3 border border-blue-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all w-full sm:w-auto"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-8">
+        {loading ? (
+          <div className="flex justify-center">
+            <Loader2Icon className="w-8 h-8 animate-spin text-blue-500" />
+          </div>
+        ) : currentData.length > 0 ? (
+          currentData.map((entry) => (
+            <div
+              key={entry.id}
+              className="flex flex-col bg-white p-6 rounded-lg shadow-xl space-y-6 transition-all hover:shadow-2xl hover:scale-105"
+            >
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-semibold text-blue-700">{entry.templateSlug}</h3>
+                <div className="space-x-3 flex-wrap sm:flex-nowrap">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleCopy(entry.aiResponse)}
+                    className="bg-blue-700 hover:bg-blue-600 text-white py-2 px-6 rounded-lg transition-all"
+                  >
+                    Copy
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => handleEdit(entry)}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-6 rounded-lg transition-all"
+                  >
+                    <Edit className="w-5 h-5" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => handleDelete(entry.id)}
+                    className="bg-red-600 hover:bg-red-700 text-white py-2 px-6 rounded-lg transition-all"
+                  >
+                    Delete
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => handleShare(entry)}
+                    className="bg-slate-500 hover:bg-slate-600 text-white py-2 px-6 rounded-lg transition-all"
+                  >
+                    <Mail className="w-5 h-5" />
+                    Share
+                  </Button>
+                  <Button
+                    onClick={() => handleDownloadPDF(entry)}
+                    className="bg-teal-600 text-white hover:bg-teal-700 py-2 px-6 rounded-lg transition-all"
+                  >
+                    Download PDF
+                  </Button>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600">{entry.aiResponse.slice(0, 150)}...</p>
+              <Button
+                variant="link"
+                className="text-sm text-blue-400 hover:text-blue-700 transition-colors duration-300 ease-in-out transform hover:scale-105 active:scale-95"
+                onClick={() => setSelectedEntry(entry)}
+              >
+                Read More
+              </Button>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500">No entries found.</p>
+        )}
+      </div>
+
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-8">
+          <nav>
+            <ul className="flex space-x-4">
+              {[...Array(totalPages)].map((_, idx) => (
+                <li key={idx}>
+                  <button
+                    onClick={() => handlePageChange(idx + 1)}
+                    className={`${
+                      currentPage === idx + 1
+                        ? "bg-teal-600 text-white"
+                        : "bg-gray-200 text-gray-700"
+                    } py-2 px-6 rounded-lg transition-all hover:bg-teal-700`}
+                  >
+                    {idx + 1}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+      )}
+    </div>
+  );
 };
 
-export default NotesPage;
+export default HistoryPage;
