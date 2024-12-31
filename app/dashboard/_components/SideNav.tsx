@@ -1,5 +1,5 @@
 "use client";
-import { FileClock, Home, Settings, MessageCircle } from 'lucide-react';
+import { FileClock, Home, Settings, MessageCircle, Notebook } from 'lucide-react';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation'; // usePathname to get current route
 import React, { useEffect } from 'react';
@@ -22,6 +22,11 @@ const SideNav: React.FC = () => {
             name: 'History',
             icon: FileClock,
             path: '/dashboard/history'
+        },
+        {
+            name: 'Notes',
+            icon: Notebook,
+            path: '/dashboard/notes'
         },
         {
             name: 'Settings',

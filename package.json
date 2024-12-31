@@ -32,11 +32,13 @@
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.0.2",
     "react-toastify": "^11.0.2",
+    "react-tsparticles": "^2.12.2",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "studio": "^0.13.5",
     "tailwind-merge": "^2.5.5",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "tsparticles": "^3.7.1"
   },
   "devDependencies": {
     "@types/node": "^20",
