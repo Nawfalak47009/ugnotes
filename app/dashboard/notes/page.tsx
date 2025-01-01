@@ -1,45 +1,52 @@
-"use client"
-import { useAuth } from "@clerk/nextjs"; // Import useAuth from Clerk
+"use client";
+import { useAuth } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
-import { db } from "../../../utils/db"; // Adjust this according to your file structure
-import { Notes } from "../../../utils/schema"; // Correct path to your Notes table definition
-import { eq } from "drizzle-orm"; // Import eq from drizzle-orm for proper comparisons
-import ComingSoonPage from "../ComingSoon/comginsoonpage";
+import { db } from "../../../utils/db";
+import { Notes } from "../../../utils/schema";
+import { eq } from "drizzle-orm";
+import ComingSoonPage from "../ComingSoon/page";
 
+// Function to generate a random hex color
+const generateRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+};
 
 const NotesPage = () => {
-    const { userId } = useAuth(); // Use useAuth to get the current authenticated user's ID
-    const [notes, setNotes] = useState<any[]>([]); // Adjust type based on your schema
-    const [noteContent, setNoteContent] = useState<string>(""); // For capturing note input
-    const [loading, setLoading] = useState<boolean>(true); // For loading state
-    const [fontStyle, setFontStyle] = useState<string>("Arial"); // Track font family
-    const [fontSize, setFontSize] = useState<string>("16px"); // Track font size
-    const [fontColor, setFontColor] = useState<string>("#000000"); // Track text color
-    const [fontWeight, setFontWeight] = useState<string>("normal"); // Track font weight
-    const [enteredCode, setEnteredCode] = useState<string>(""); // State for the entered code
-    const [isCodeCorrect, setIsCodeCorrect] = useState<boolean>(false); // Flag to check if the code is correct
+    const { userId } = useAuth();
+    const [noteContent, setNoteContent] = useState<string>("");
+    const [noteTitle, setNoteTitle] = useState<string>(""); // New state for title
+    const [loading, setLoading] = useState<boolean>(true);
+    const [fontStyle, setFontStyle] = useState<string>("Arial");
+    const [fontSize, setFontSize] = useState<string>("16px");
+    const [fontColor, setFontColor] = useState<string>("#000000");
+    const [fontWeight, setFontWeight] = useState<string>("normal");
+    const [statusMessage, setStatusMessage] = useState<string>("");
+    const [statusMessageColor, setStatusMessageColor] = useState<string>("#4CAF50"); // Default success color
+    const [premiumCode, setPremiumCode] = useState<string>(""); // State for storing entered code
+    const [isUnlocked, setIsUnlocked] = useState<boolean>(false); // State for tracking if the page is unlocked
 
-    const currentYear = new Date().getFullYear(); // Get current year
+    const currentYear = new Date().getFullYear();
 
     useEffect(() => {
         if (userId) {
-            // Fetch notes when the page loads
             fetchNotes();
         }
-    }, [userId]); // Re-fetch notes when the userId changes or page mounts
+    }, [userId]);
 
-    // Function to fetch notes from the database
     const fetchNotes = async () => {
         setLoading(true);
         try {
-            // Ensure that we fetch only notes related to the authenticated user
             if (userId) {
                 const fetchedNotes = await db
                     .select()
                     .from(Notes)
-                    .where(eq(Notes.userId, userId)) // Fetch notes for the authenticated user
+                    .where(eq(Notes.userId, userId))
                     .execute();
-                setNotes(fetchedNotes);
             } else {
                 console.error("User ID is undefined");
             }
@@ -50,110 +57,147 @@ const NotesPage = () => {
         }
     };
 
-    // Function to handle new note creation
+    const handleFontSizeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const newFontSize = event.target.value;
+        if (!isNaN(parseInt(newFontSize))) {
+            setFontSize(`${newFontSize}px`);
+        }
+    };
+
     const handleAddNote = async () => {
-        if (!noteContent.trim()) {
-            alert("Please enter some note content!");
+        // Ensure both title and content are provided
+        const finalTitle = noteTitle.trim() ? noteTitle : "Untitled Note";
+
+        if (!finalTitle.trim() || !noteContent.trim()) {
+            setStatusMessage("Please enter both a title and content for the note.");
+            setStatusMessageColor("#FF5733"); // Set an error color (Red)
+            setTimeout(() => {
+                setStatusMessage("");
+            }, 3000);
             return;
         }
 
         try {
             if (userId) {
-                // Insert the note into the database with userId, title, and content
                 await db.insert(Notes).values({
-                    userId: userId, // Use the userId from Clerk
-                    title: "Untitled Note",  // Default title or dynamically set title
-                    content: noteContent, // Content of the note
-                    createdAt: new Date(), // Automatically generated timestamp (default set in schema)
+                    userId: userId,
+                    title: finalTitle,
+                    content: noteContent,
+                    createdAt: new Date(),
                 }).execute();
 
-                setNoteContent(""); // Reset note content after adding
-                fetchNotes(); // Re-fetch notes to include the newly added one
+                // Display success message
+                setStatusMessage("Note successfully added!");
+                setStatusMessageColor(generateRandomColor()); // Set a new random color for success
+
+                // Clear message after 3 seconds
+                setTimeout(() => {
+                    setStatusMessage("");
+                }, 3000);
+
+                setNoteTitle(""); // Clear the title after adding the note
+                setNoteContent(""); // Clear the content after adding the note
             }
         } catch (error) {
             console.error("Error adding note:", error);
+            // Display error message
+            setStatusMessage("Error adding note. Please try again.");
+            setStatusMessageColor("#FF5733"); // Set an error color (Red)
+
+            // Clear message after 3 seconds
+            setTimeout(() => {
+                setStatusMessage("");
+            }, 3000);
         }
     };
 
-    // Function to handle note deletion
-    const handleDeleteNote = async (noteId: string) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this note?");
-        if (confirmDelete) {
-            try {
-                // Convert noteId to a number before passing to eq
-                await db.delete(Notes).where(eq(Notes.id, Number(noteId))).execute();
-                fetchNotes(); // Re-fetch the notes after deletion
-            } catch (error) {
-                console.error("Error deleting note:", error);
-            }
-        }
-    };
-
-    // Function to handle code verification
-    const handleCodeSubmit = () => {
-        if (enteredCode === "4543") {
-            setIsCodeCorrect(true); // Unlock the page if code is correct
+    const handleUnlock = () => {
+        if (premiumCode === "4543") {
+            setIsUnlocked(true); // Unlock the page
+            setStatusMessage("Page unlocked successfully!");
+            setStatusMessageColor("#4CAF50"); // Green success color
+            setTimeout(() => {
+                setStatusMessage(""); // Clear status message
+            }, 3000);
         } else {
-            alert("Incorrect code! Please try again.");
+            setStatusMessage("Incorrect code. Please try again.");
+            setStatusMessageColor("#FF5733"); // Red error color
+            setTimeout(() => {
+                setStatusMessage(""); // Clear status message
+            }, 3000);
         }
     };
 
-    if (!isCodeCorrect) {
+    if (!isUnlocked) {
         return (
-            <div style={{ maxWidth: "400px", margin: "auto", padding: "20px", textAlign: "center" }}>
-                <h1
-                    style={{
-                        fontSize: "32px",
-                        fontWeight: "700",
-                        color: "#333",
-                        textAlign: "center",
-                        marginBottom: "20px",
-                        textTransform: "uppercase",
-                        letterSpacing: "2px",
-                        fontFamily: "'Roboto', sans-serif",
-                        textShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                    }}
-                >
-                    <ComingSoonPage />
-                    Enter Access Code 
-
+            <div style={{ maxWidth: "960px", margin: "auto", padding: "20px", fontFamily: "'Courier New', monospace", backgroundColor: "#f9f9f9" }}>
+                <ComingSoonPage />
+                <h1 style={{ textAlign: "center", color: "#333", fontSize: "32px", fontWeight: "700", marginBottom: "20px", textTransform: "uppercase" }}>
+                    Enter Premium Code to Unlock Notes Page
                 </h1>
+
+                {/* Display Status Message */}
+                {statusMessage && (
+                    <div
+                        style={{
+                            marginBottom: "20px",
+                            padding: "15px",
+                            backgroundColor: statusMessageColor, // Apply the color
+                            color: "#fff",
+                            borderRadius: "8px",
+                            textAlign: "center",
+                            fontSize: "16px",
+                            fontWeight: "600",
+                            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+                            maxWidth: "90%",
+                            margin: "0 auto",
+                        }}
+                    >
+                        {statusMessage}
+                    </div>
+                )}
 
                 <input
                     type="text"
-                    value={enteredCode}
-                    onChange={(e) => setEnteredCode(e.target.value)}
-                    placeholder="Enter 4-digit code"
+                    value={premiumCode}
+                    onChange={(e) => setPremiumCode(e.target.value)}
+                    placeholder="Enter code"
                     style={{
-                        padding: "12px 16px",
-                        fontSize: "18px",
-                        marginBottom: "15px",
                         width: "100%",
+                        padding: "10px",
+                        fontSize: "20px",
+                        fontWeight: "700",
                         borderRadius: "8px",
-                        border: "2px solid #ccc",
-                        backgroundColor: "#f4f4f4",
-                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                        border: "1px solid #ddd",
+                        marginBottom: "20px",
                         outline: "none",
-                        transition: "border-color 0.3s ease, box-shadow 0.3s ease",
                     }}
-                    onFocus={(e) => e.target.style.borderColor = "#4CAF50"}
-                    onBlur={(e) => e.target.style.borderColor = "#ccc"}
                 />
-                <button
-                    onClick={handleCodeSubmit}
+
+                <div
                     style={{
-                        backgroundColor: "#4CAF50",
-                        color: "#fff",
-                        padding: "10px 20px",
-                        borderRadius: "5px",
-                        border: "none",
-                        cursor: "pointer",
-                        fontSize: "16px",
-                        marginTop: "10px",
+                        display: "flex",
+                        justifyContent: "center", // Centers horizontally
+                        alignItems: "center", // Centers vertically
+                        textAlign: "center", // Aligns text in the center (optional)
                     }}
                 >
-                    Submit
-                </button>
+                    <button
+                        onClick={handleUnlock}
+                        style={{
+                            backgroundColor: "#4CAF50",
+                            color: "#fff",
+                            padding: "10px 20px",
+                            borderRadius: "5px",
+                            border: "none",
+                            cursor: "pointer",
+                            fontSize: "16px",
+                        }}
+                    >
+                        Unlock Page
+                    </button>
+                </div>
+
             </div>
         );
     }
@@ -161,47 +205,104 @@ const NotesPage = () => {
     return (
         <div style={{ maxWidth: "960px", margin: "auto", padding: "20px", fontFamily: "'Courier New', monospace", backgroundColor: "#f9f9f9" }}>
             <h1 style={{ textAlign: "center", color: "#333", fontSize: "32px", fontWeight: "700", marginBottom: "20px", textTransform: "uppercase" }}>
-                Notes ({currentYear})
+                Add New Note ({currentYear})
             </h1>
 
-            {/* Note style toolbar */}
-            <div style={{ marginBottom: "20px", display: "flex", justifyContent: "space-between", flexWrap: "wrap" }}>
-                {/* Font Style Selector */}
-                <select value={fontStyle} onChange={(e) => setFontStyle(e.target.value)} style={{ padding: "8px", fontSize: "14px", marginBottom: "10px", flex: "1" }}>
+            {/* Display Status Message */}
+            {statusMessage && (
+                <div
+                    style={{
+                        marginBottom: "20px",
+                        padding: "15px",
+                        backgroundColor: statusMessageColor,
+                        color: "#fff",
+                        borderRadius: "8px",
+                        textAlign: "center",
+                        fontSize: "16px",
+                        fontWeight: "600",
+                        boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+                        maxWidth: "90%",
+                        margin: "0 auto",
+                    }}
+                >
+                    {statusMessage}
+                </div>
+            )}
+
+            <div style={{ backgroundColor: "#fff", borderRadius: "12px", padding: "20px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)", marginBottom: "20px" }}>
+                <input
+                    type="text"
+                    value={noteTitle}
+                    onChange={(e) => setNoteTitle(e.target.value)}
+                    placeholder="Enter note title"
+                    style={{
+                        width: "100%",
+                        padding: "10px",
+                        fontSize: "20px",
+                        fontWeight: "700",
+                        borderRadius: "8px",
+                        border: "1px solid #ddd",
+                        marginBottom: "10px",
+                        outline: "none",
+                    }}
+                />
+            </div>
+
+            <div style={{ marginBottom: "20px" }}>
+                <label htmlFor="fontStyle" style={{ marginRight: "10px" }}>Font Style:</label>
+                <select
+                    id="fontStyle"
+                    value={fontStyle}
+                    onChange={(e) => setFontStyle(e.target.value)}
+                    style={{ padding: "5px", marginRight: "20px" }}
+                >
                     <option value="Arial">Arial</option>
                     <option value="Courier New">Courier New</option>
-                    <option value="Georgia">Georgia</option>
                     <option value="Times New Roman">Times New Roman</option>
-                    <option value="Verdana">Verdana</option>
                 </select>
 
-                {/* Font Size Selector */}
-                <select value={fontSize} onChange={(e) => setFontSize(e.target.value)} style={{ padding: "8px", fontSize: "14px", marginBottom: "10px", flex: "1" }}>
-                    <option value="14px">14px</option>
-                    <option value="16px">16px</option>
-                    <option value="18px">18px</option>
-                    <option value="20px">20px</option>
-                    <option value="24px">24px</option>
-                </select>
-
-                {/* Text Color Selector */}
+                <label htmlFor="fontSize" style={{ marginRight: "10px" }}>Font Size:</label>
                 <input
-                    type="color"
-                    value={fontColor}
-                    onChange={(e) => setFontColor(e.target.value)}
-                    style={{ padding: "5px", cursor: "pointer", marginBottom: "10px", flex: "1" }}
+                    type="number"
+                    id="fontSize"
+                    value={parseInt(fontSize)}
+                    onChange={(e) => setFontSize(`${e.target.value}px`)}
+                    style={{ padding: "5px", width: "60px", marginRight: "20px" }}
                 />
 
-                {/* Font Weight Selector */}
-                <select value={fontWeight} onChange={(e) => setFontWeight(e.target.value)} style={{ padding: "8px", fontSize: "14px", marginBottom: "10px", flex: "1" }}>
+                <label htmlFor="fontColor" style={{ marginRight: "10px" }}>Font Color:</label>
+                <input
+                    type="color"
+                    id="fontColor"
+                    value={fontColor}
+                    onChange={(e) => setFontColor(e.target.value)}
+                    style={{ padding: "5px", marginRight: "20px" }}
+                />
+
+                <label htmlFor="fontWeight" style={{ marginRight: "10px" }}>Font Weight:</label>
+                <select
+                    id="fontWeight"
+                    value={fontWeight}
+                    onChange={(e) => setFontWeight(e.target.value)}
+                    style={{ padding: "5px" }}
+                >
                     <option value="normal">Normal</option>
                     <option value="bold">Bold</option>
-                    <option value="medium">Medium</option>
+                    <option value="italic">Italic</option>
                 </select>
             </div>
 
-            {/* Note creation form */}
-            <div style={{ backgroundColor: "#fff", borderRadius: "12px", padding: "20px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)", marginBottom: "30px", border: "1px solid #ddd", fontFamily: fontStyle }}>
+            <div
+                style={{
+                    backgroundColor: "#fff",
+                    borderRadius: "12px",
+                    padding: "20px",
+                    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                    marginBottom: "30px",
+                    border: "1px solid #ddd",
+                    fontFamily: fontStyle,
+                }}
+            >
                 <textarea
                     value={noteContent}
                     onChange={(e) => setNoteContent(e.target.value)}
@@ -236,55 +337,6 @@ const NotesPage = () => {
                     Add Note
                 </button>
             </div>
-
-            {/* Notes Display */}
-            {loading ? (
-                <p>Loading...</p>
-            ) : (
-                notes.length > 0 ? (
-                    <ul style={{ listStyleType: "none", padding: "0" }}>
-                        {notes.map((note) => (
-                            <li
-                                key={note.id}
-                                style={{
-                                    backgroundColor: "#fff",
-                                    marginBottom: "20px",
-                                    borderRadius: "12px",
-                                    padding: "20px",
-                                    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                                    border: "1px solid #ddd",
-                                    fontFamily: fontStyle,
-                                    fontSize: fontSize,
-                                    color: fontColor,
-                                    fontWeight: fontWeight,
-                                }}
-                            >
-                                <h2 style={{ fontSize: "20px", fontWeight: "700", marginBottom: "10px" }}>
-                                    {note.title}
-                                </h2>
-                                <p>{note.content}</p>
-                                <button
-                                    onClick={() => handleDeleteNote(note.id)}
-                                    style={{
-                                        backgroundColor: "#ff4d4d",
-                                        color: "#fff",
-                                        padding: "5px 15px",
-                                        borderRadius: "5px",
-                                        border: "none",
-                                        cursor: "pointer",
-                                        fontSize: "14px",
-                                        marginTop: "10px",
-                                    }}
-                                >
-                                    Delete
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>No notes found</p>
-                )
-            )}
         </div>
     );
 };

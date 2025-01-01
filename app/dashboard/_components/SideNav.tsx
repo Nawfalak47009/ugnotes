@@ -1,5 +1,5 @@
 "use client";
-import { FileClock, Home, Settings, MessageCircle, Notebook } from 'lucide-react';
+import { FileClock, Home, Settings, Notebook, Bookmark } from 'lucide-react';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation'; // usePathname to get current route
 import React, { useEffect } from 'react';
@@ -29,11 +29,20 @@ const SideNav: React.FC = () => {
             path: '/dashboard/notes'
         },
         {
+            name: 'Notes History',
+            icon: FileClock,  // Use the same icon or a different one for notes history
+            path: '/dashboard/notes-history'
+        },
+        {
+            name: 'Bookmarked Notes',
+            icon: Bookmark,  // Can use a different icon
+            path: '/dashboard/bookmarks'  // Link to the Bookmarked Notes page
+        },
+        {
             name: 'Settings',
             icon: Settings,
             path: '/dashboard/settings'
         }
-       
     ];
 
     const path = usePathname(); // Get the current path
@@ -64,6 +73,6 @@ const SideNav: React.FC = () => {
             </div>
         </div>
     );
-}
+};
 
 export default SideNav;

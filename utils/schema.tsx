@@ -1,4 +1,4 @@
-import { pgTable, serial, text, varchar, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, varchar, timestamp, boolean } from "drizzle-orm/pg-core";
 
 export const AIOutput = pgTable('aiOutput', {
   id: serial('id').primaryKey(),
@@ -18,6 +18,8 @@ export const Notes = pgTable('notes', {
   title: varchar('title', { length: 255 }).notNull(), // Title of the note
   content: text('content').notNull(), // Content of the note
   createdAt: timestamp('createdAt', { withTimezone: true }).defaultNow(), // Creation timestamp
+  bookmarked: boolean('bookmarked').default(false), 
+  pinned: boolean("pinned").default(false), 
 });
 
 
