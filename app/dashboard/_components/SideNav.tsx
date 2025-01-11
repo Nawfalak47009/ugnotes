@@ -1,5 +1,5 @@
 "use client";
-import { FileClock, Home, Settings, Notebook, Bookmark } from 'lucide-react';
+import { FileClock, Home, Settings, Notebook, Bookmark, DollarSign } from 'lucide-react'; // Add DollarSign icon
 import Image from 'next/image';
 import { usePathname } from 'next/navigation'; // usePathname to get current route
 import React, { useEffect } from 'react';
@@ -37,6 +37,11 @@ const SideNav: React.FC = () => {
             name: 'Bookmarked Notes',
             icon: Bookmark,  // Can use a different icon
             path: '/dashboard/bookmarks'  // Link to the Bookmarked Notes page
+        },
+        {
+            name: 'Expenses Tracker', // Add new section
+            icon: DollarSign, // Use the DollarSign icon for Expenses Tracker
+            path: '/dashboard/expenses' // Link to the Expenses Tracker page
         },
         {
             name: 'Settings',
