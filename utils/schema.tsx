@@ -34,4 +34,3 @@ export const Expenses = pgTable('expenses', {
   date: date('date').notNull(), // Date of the expense (without time)
   day: varchar('day', { length: 10 }).notNull(), // Day of the week (e.g., "Monday")
 });
-

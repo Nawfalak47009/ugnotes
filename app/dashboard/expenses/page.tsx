@@ -138,9 +138,10 @@ const ExpensesTracker: React.FC = () => {
       },
     ],
   };
+
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
-  
+
     // Table Columns
     const columns = ["Expense Name", "Amount", "Category", "Date"];
     const rows = expenseList.map((expense) => [
@@ -149,7 +150,7 @@ const ExpensesTracker: React.FC = () => {
       expense.category,
       dayjs(expense.date).format("MMMM D, YYYY"),
     ]);
-  
+
     // Add the total row at the end of the table
     rows.push([
       "Total", // Row for total
@@ -157,20 +158,19 @@ const ExpensesTracker: React.FC = () => {
       "", // Leave the category empty for the total row
       "", // Leave the date empty for the total row
     ]);
-  
+
     // Add the table to the PDF
     autoTable(doc, {
       head: [columns],
       body: rows,
     });
-  
+
     // Save the PDF
     doc.save("expenses.pdf");
   };
-  
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-100 via-blue-200 to-blue-300 p-6">
+    <div className="min-h-screen bg-gradient-to-r from-blue-100 via-blue-200 to-blue-300 p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-semibold">Expenses Tracker</h1>
@@ -179,7 +179,7 @@ const ExpensesTracker: React.FC = () => {
 
         {isSignedIn ? (
           <div className="space-y-4 mb-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               <Input
                 type="text"
                 placeholder="Enter expense name"
@@ -207,7 +207,7 @@ const ExpensesTracker: React.FC = () => {
                 onChange={(e) => setDate(e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded-lg"
               />
-              <div className="flex space-x-4">
+              <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mt-4 sm:mt-0">
                 <Button
                   onClick={handleAddExpense}
                   className="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-3 rounded-lg"
@@ -216,9 +216,9 @@ const ExpensesTracker: React.FC = () => {
                 </Button>
                 <Button
                   onClick={handleDownloadPDF}
-                  className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg"
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg text-sm sm:text-base"
                 >
-                  Download as PDF
+                  Download
                 </Button>
               </div>
             </div>
