@@ -33,14 +33,20 @@ function OutputSection({ aiOutput }: Props) {
     <div className='p-5 bg-white shadow-lg rounded-xl border-2 border-blue-400 hover:border-blue-500 transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-[0_0_15px_6px_#2832c2]'>
       <div className='flex justify-between items-center p-5'>
         <h2 className='font-medium text-lg text-gray-800'>Your Result</h2>
-        <Button className='flex gap-2 text-blue-400 hover:text-blue-600' onClick={handleCopy}>
-          <Copy className='w-4 h-4' /> Copy
+        <Button
+          className="flex items-center gap-2 text-sm md:text-base lg:text-lg text-blue-400 hover:text-blue-600 p-2 md:p-3"
+          onClick={handleCopy}
+        >
+          <Copy className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
+          <span className="hidden sm:inline">Copy</span>
         </Button>
+
       </div>
       <Editor
         ref={editorRef}
         initialValue="Your Result will appear here"
         height="600px"
+        width="100%"
         initialEditType="wysiwyg"
         useCommandShortcut={true}
         onChange={() => console.log(editorRef.current?.getInstance().getMarkdown())}

@@ -1,30 +1,28 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import ComingSoonPage from '../ComingSoon/page'; // Import the ComingSoon page
+import ComingSoonPage from '../ComingSoon/page';
 import { TEMPLATE } from './TemplateListSection';
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion'; // Importing framer-motion for animations
+import { motion } from 'framer-motion';
 
 function TemplateCard(item: TEMPLATE) {
-  const [showComingSoon, setShowComingSoon] = useState(false); // State to manage showing Coming Soon
-  const [loading, setLoading] = useState(false); // Optional loading state
+  const [showComingSoon, setShowComingSoon] = useState(false);
 
   useEffect(() => {
-    // Check if the ComingSoonPage has already been shown in this session
     const hasVisitedBefore = localStorage.getItem('hasVisited');
 
     if (!hasVisitedBefore) {
-      setShowComingSoon(true); // Show Coming Soon if not visited before
-      localStorage.setItem('hasVisited', 'true'); // Mark that the user has visited
+      setShowComingSoon(true);
+      localStorage.setItem('hasVisited', 'true');
     }
 
     const timeout = setTimeout(() => {
-      setShowComingSoon(false); // Hide Coming Soon page after 15 seconds
-    }, 15000); // 15 seconds delay
+      setShowComingSoon(false);
+    }, 15000);
 
-    return () => clearTimeout(timeout); // Cleanup timeout when the component unmounts
+    return () => clearTimeout(timeout);
   }, []);
 
   if (showComingSoon) {
@@ -32,37 +30,42 @@ function TemplateCard(item: TEMPLATE) {
       <div className="absolute inset-0 bg-white flex items-center justify-center z-50">
         <ComingSoonPage />
       </div>
-    ); // Full screen Coming Soon page for 15 seconds
+    );
   }
 
   return (
     <Link href={'/dashboard/content/' + item?.slug}>
       <motion.div
-        initial={{ opacity: 0, y: 20 }} // Initial state before animation
-        animate={{ opacity: 1, y: 0 }} // Final state of the animation
-        transition={{ duration: 0.5, delay: 0.1 }} // Duration and delay for the animation
-        className="p-6 bg-white shadow-lg rounded-xl border border-gray-200 hover:scale-105 transition-all ease-in-out transform hover:translate-y-2 hover:bg-blue-50 hover:shadow-[0_0_10px_5px_#ADD8E6] flex flex-col items-center justify-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="p-6 bg-white shadow-md rounded-2xl border border-gray-300 hover:shadow-lg hover:bg-blue-50 transition-all transform hover:scale-105 w-full h-[360px] flex flex-col items-center justify-between space-y-4"
       >
         <motion.div
-          whileHover={{ scale: 1.1 }} // Zoom-in effect on hover
-          whileTap={{ scale: 0.9 }} // Shrinks when clicked
-          className="flex items-center justify-center mb-4"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          className="flex items-center justify-center w-[100px] h-[100px] bg-blue-100 rounded-full border-2 border-blue-700 shadow-sm"
         >
           <Image
             src={item.icon}
             alt="icon"
             width={60}
             height={60}
-            className="rounded-full border-2 border-blue-700 p-2 transition-all duration-200 transform"
+            className="rounded-full p-2 transition-transform"
           />
         </motion.div>
-        <h2 className="font-semibold text-xl text-gray-800 text-center hover:text-blue-500 transition-all duration-200">
+        <h2 className="font-bold text-lg text-gray-800 text-center hover:text-blue-500 transition-colors duration-200">
           {item.name}
         </h2>
-        <p className="text-gray-500 text-sm line-clamp-3 text-center mt-2">{item.desc}</p>
+        <p className="text-gray-600 text-sm text-center line-clamp-3">
+          {item.desc}
+        </p>
       </motion.div>
     </Link>
   );
 }
 
 export default TemplateCard;
+
+
+
