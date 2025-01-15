@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 
 function TemplateCard(item: TEMPLATE) {
   const [showComingSoon, setShowComingSoon] = useState(false);
+  const [hasClicked, setHasClicked] = useState(false); // Track if the user clicked
 
   useEffect(() => {
     const hasVisitedBefore = localStorage.getItem('hasVisited');
@@ -22,8 +23,20 @@ function TemplateCard(item: TEMPLATE) {
       setShowComingSoon(false);
     }, 15000);
 
+    // Check localStorage for hasClicked status
+    const userHasClicked = localStorage.getItem('hasClicked');
+    if (userHasClicked === 'true') {
+      setHasClicked(true);
+    }
+
     return () => clearTimeout(timeout);
   }, []);
+
+  // Handle card click to hide "New" badge
+  const handleCardClick = () => {
+    setHasClicked(true);
+    localStorage.setItem('hasClicked', 'true'); // Persist the click state in localStorage
+  };
 
   if (showComingSoon) {
     return (
@@ -38,13 +51,15 @@ function TemplateCard(item: TEMPLATE) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="p-6 bg-white shadow-md rounded-2xl border border-gray-300 hover:shadow-lg hover:bg-blue-50 transition-all transform hover:scale-105 w-full h-[360px] flex flex-col items-center justify-between space-y-4"
+        transition={{ duration: 0.7, delay: 0.1 }}
+        className="relative p-6 bg-white shadow-xl rounded-3xl border border-gray-200 hover:shadow-2xl hover:bg-blue-100 transition-all transform hover:scale-110 w-full h-[360px] flex flex-col items-center justify-between space-y-4"
+        onClick={handleCardClick} // Set clicked state when the card is clicked
       >
+        {/* Icon with additional hover effect */}
         <motion.div
-          whileHover={{ scale: 1.1 }}
+          whileHover={{ scale: 1.15, rotate: 15 }}
           whileTap={{ scale: 0.95 }}
-          className="flex items-center justify-center w-[100px] h-[100px] bg-blue-100 rounded-full border-2 border-blue-700 shadow-sm"
+          className="flex items-center justify-center w-[100px] h-[100px] bg-gradient-to-r from-blue-400 to-blue-600 rounded-full border-2 border-blue-700 shadow-lg transition-all duration-300 transform hover:scale-110"
         >
           <Image
             src={item.icon}
@@ -54,18 +69,35 @@ function TemplateCard(item: TEMPLATE) {
             className="rounded-full p-2 transition-transform"
           />
         </motion.div>
-        <h2 className="font-bold text-lg text-gray-800 text-center hover:text-blue-500 transition-colors duration-200">
+
+        {/* Title with 3D effect */}
+        <motion.h2
+          className="font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400 text-center hover:text-blue-600 transition-colors duration-300"
+          whileHover={{ scale: 1.05 }}
+        >
           {item.name}
-        </h2>
-        <p className="text-gray-600 text-sm text-center line-clamp-3">
+        </motion.h2>
+
+        {/* Description with hover animation */}
+        <motion.p
+          className="text-gray-600 text-sm text-center line-clamp-3 hover:text-blue-500 transition-colors duration-300"
+          whileHover={{ scale: 1.05 }}
+        >
           {item.desc}
-        </p>
+        </motion.p>
+
+        {/* New Badge, visible only if not clicked */}
+        {!hasClicked && (
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            className="absolute top-4 right-4 text-xs text-white bg-blue-600 py-1 px-3 rounded-full shadow-md"
+          >
+            New
+          </motion.div>
+        )}
       </motion.div>
     </Link>
   );
 }
 
 export default TemplateCard;
-
-
-

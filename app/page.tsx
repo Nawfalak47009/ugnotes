@@ -17,37 +17,56 @@ const CircleUIPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-500 via-blue-600 to-blue-800 text-white relative overflow-hidden">
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 text-white relative overflow-hidden">
       {/* Title Section */}
       <motion.div
-        initial={{ y: -50, opacity: 0 }}
+        initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 1 }}
+        transition={{ duration: 1.5, ease: 'easeOut' }}
         className="text-center z-10"
       >
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4">
+        <motion.h1
+          className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-blue-400 drop-shadow-2xl"
+          initial={{ x: -200 }}
+          animate={{ x: 0 }}
+          transition={{ type: 'spring', stiffness: 120 }}
+        >
           UG NOTES
-        </h1>
-        <p className="text-lg sm:text-xl lg:text-2xl mb-8 max-w-xl mx-auto text-gray-100">
+        </motion.h1>
+        <motion.p
+          className="text-lg sm:text-xl lg:text-2xl mb-4 max-w-xl mx-auto text-white"
+          initial={{ x: 200 }}
+          animate={{ x: 0 }}
+          transition={{ type: 'spring', stiffness: 120 }}
+        >
           A platform to access notes and study materials
-        </p>
+        </motion.p>
       </motion.div>
 
-      {/* Circle Elements */}
+      {/* Parallax Scrolling Background */}
+      <motion.div
+        className="absolute w-full h-full bg-gradient-to-br from-blue-500 via-indigo-700 to-blue-800 z-0"
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ type: 'spring', stiffness: 60 }}
+      ></motion.div>
+
+      {/* Circle Elements with 3D Hover Effects */}
       <div className="relative w-full h-full flex justify-center items-center z-0">
         {/* Large Circle */}
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ duration: 1, type: 'spring', stiffness: 60 }}
-          className="absolute w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg"
+          transition={{ duration: 2, type: 'spring', stiffness: 60 }}
+          className="absolute w-56 sm:w-64 md:w-80 lg:w-96 h-56 sm:h-64 md:h-80 lg:h-96 bg-gradient-to-br from-teal-500 to-teal-300 rounded-full flex items-center justify-center shadow-2xl transform hover:scale-110 hover:rotate-6 transition-all duration-300"
         >
           <Image
             src="/creativity.png"
             alt="Central Circle Logo"
-            width={80}
-            height={80}
+            width={120}
+            height={120}
             priority
+            className="transform scale-110 hover:scale-125 transition-all duration-300"
           />
         </motion.div>
 
@@ -55,32 +74,32 @@ const CircleUIPage = () => {
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ duration: 1.2, delay: 0.3 }}
-          className="absolute w-48 h-48 sm:w-64 sm:h-64 lg:w-72 lg:h-72 bg-teal-300 rounded-full -top-20 -left-20 lg:-top-32 lg:-left-32 shadow-md"
+          transition={{ duration: 2.2, delay: 0.4 }}
+          className="absolute w-40 sm:w-48 md:w-64 lg:w-72 h-40 sm:h-48 md:h-64 lg:h-72 bg-gradient-to-tl from-purple-600 to-purple-400 rounded-full -top-16 -left-16 lg:-top-24 lg:-left-24 shadow-lg transform hover:scale-110 hover:rotate-6 transition-all duration-300"
         ></motion.div>
 
         {/* Small Circle */}
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ duration: 1.4, delay: 0.6 }}
-          className="absolute w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 bg-purple-300 rounded-full -bottom-20 -right-20 lg:-bottom-32 lg:-right-32 shadow-sm"
+          transition={{ duration: 2.4, delay: 0.6 }}
+          className="absolute w-28 sm:w-32 md:w-40 lg:w-48 h-28 sm:h-32 md:h-40 lg:h-48 bg-gradient-to-br from-blue-600 to-blue-400 rounded-full -bottom-16 -right-16 lg:-bottom-24 lg:-right-24 shadow-sm transform hover:scale-110 hover:rotate-6 transition-all duration-300"
         ></motion.div>
       </div>
 
-      {/* Get Started Button */}
+      {/* Get Started Button with Neon Effect */}
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 1.2, delay: 0.5 }}
+        transition={{ duration: 1.8, delay: 1 }}
         className="z-10 mt-8"
       >
         <button
           onClick={handleGetStarted}
           disabled={loading}
           className={`${
-            loading ? 'bg-opacity-50 cursor-not-allowed' : 'bg-yellow-400 hover:bg-yellow-500'
-          } px-8 py-4 rounded-full text-lg font-bold text-black shadow-lg transform transition-all duration-300 hover:scale-105`}
+            loading ? 'bg-opacity-50 cursor-not-allowed' : 'bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600'
+          } px-10 py-4 sm:px-8 sm:py-3 md:px-10 md:py-4 lg:px-12 lg:py-5 rounded-full text-lg font-bold text-black shadow-xl transform transition-all duration-300 hover:scale-110 hover:shadow-2xl animate-pulse`}
         >
           {loading ? (
             <div className="flex items-center justify-center">
@@ -93,15 +112,40 @@ const CircleUIPage = () => {
         </button>
       </motion.div>
 
-      {/* Footer */}
+      {/* Footer with Motion Animation */}
       <motion.footer
         initial={{ y: 30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, delay: 1 }}
+        transition={{ duration: 1, delay: 1.2 }}
         className="absolute bottom-6 text-sm text-gray-300 z-10"
       >
-        2024@Ugnotes All Rights Reserved.
+        <p>&copy; 2024 UGNOTES. All Rights Reserved.</p>
+        <p className="italic">Crafted with 💙 by UGNOTES Team</p>
       </motion.footer>
+
+      {/* Interactive Particles */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 1.5, delay: 0.3 }}
+          className="absolute w-24 h-24 bg-white rounded-full opacity-40 animate-ping"
+          style={{
+            left: '30%',
+            top: '50%',
+          }}
+        ></motion.div>
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 1.5, delay: 0.6 }}
+          className="absolute w-24 h-24 bg-white rounded-full opacity-30 animate-ping"
+          style={{
+            right: '15%',
+            top: '20%',
+          }}
+        ></motion.div>
+      </div>
     </div>
   );
 };

@@ -6,9 +6,9 @@ import {
     Notebook, 
     Bookmark, 
     DollarSign, 
-    Calendar, 
-    Contact
-} from 'lucide-react'; // Add Calendar icon
+    Contact,
+    Currency,
+} from 'lucide-react'; 
 import Image from 'next/image';
 import { usePathname } from 'next/navigation'; // usePathname to get current route
 import React, { useEffect } from 'react';
@@ -51,6 +51,11 @@ const SideNav: React.FC = () => {
             name: 'Expenses Tracker',
             icon: DollarSign,
             path: '/dashboard/expenses'
+        },
+        {
+            name: 'Currency convetor',
+            icon: Currency,
+            path: '/dashboard/currency-convetor'
         },
         {
             name: 'Settings',

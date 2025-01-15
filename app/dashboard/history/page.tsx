@@ -316,14 +316,14 @@ const HistoryPage = () => {
                 <li key={idx}>
                   <button
                     onClick={() => handlePageChange(idx + 1)}
-                    className={`${
-                      currentPage === idx + 1
-                        ? "bg-teal-600 text-white"
-                        : "bg-gray-200 text-gray-700"
-                    } py-2 px-6 rounded-lg transition-all hover:bg-teal-700`}
+                    className={`${currentPage === idx + 1
+                        ? "bg-blue-600 text-white shadow-md scale-105"
+                        : "bg-gray-300 text-gray-700 hover:bg-blue-500 hover:text-white"
+                      } py-3 px-6 rounded-full transition-all duration-300 ease-in-out hover:scale-105`}
                   >
                     {idx + 1}
                   </button>
+
                 </li>
               ))}
             </ul>
