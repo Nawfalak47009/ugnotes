@@ -28,7 +28,6 @@ const SideNav: React.FC = () => {
     { name: "Notes History", icon: FileClock, path: "/dashboard/notes-history" },
     { name: "Bookmarked Notes", icon: Bookmark, path: "/dashboard/bookmarks" },
     { name: "Expenses Tracker", icon: DollarSign, path: "/dashboard/expenses" },
-    { name: "Currency Converter", icon: Currency, path: "/dashboard/currency-converter" },
     { name: "Settings", icon: Settings, path: "/dashboard/settings" },
     { name: "Contact", icon: Contact, path: "/dashboard/contact" },
   ];
