@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import ComingSoonPage from '../ComingSoon/page';
 import { TEMPLATE } from './TemplateListSection';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -37,14 +36,6 @@ function TemplateCard(item: TEMPLATE) {
     setHasClicked(true);
     localStorage.setItem('hasClicked', 'true'); // Persist the click state in localStorage
   };
-
-  if (showComingSoon) {
-    return (
-      <div className="absolute inset-0 bg-white flex items-center justify-center z-50">
-        <ComingSoonPage />
-      </div>
-    );
-  }
 
   return (
     <Link href={'/dashboard/content/' + item?.slug}>
