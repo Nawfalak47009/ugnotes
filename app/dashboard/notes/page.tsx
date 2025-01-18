@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { db } from "../../../utils/db";
 import { Notes } from "../../../utils/schema";
 import { eq } from "drizzle-orm";
-import ComingSoonPage from "../ComingSoon/page";
+
 
 // Function to generate a random hex color
 const generateRandomColor = () => {
@@ -27,8 +27,7 @@ const NotesPage = () => {
     const [fontWeight, setFontWeight] = useState<string>("normal");
     const [statusMessage, setStatusMessage] = useState<string>("");
     const [statusMessageColor, setStatusMessageColor] = useState<string>("#4CAF50"); // Default success color
-    const [premiumCode, setPremiumCode] = useState<string>(""); // State for storing entered code
-    const [isUnlocked, setIsUnlocked] = useState<boolean>(false); // State for tracking if the page is unlocked
+
 
     const currentYear = new Date().getFullYear();
 
@@ -111,96 +110,7 @@ const NotesPage = () => {
         }
     };
 
-    const handleUnlock = () => {
-        if (premiumCode === "4543") {
-            setIsUnlocked(true); // Unlock the page
-            setStatusMessage("Page unlocked successfully!");
-            setStatusMessageColor("#4CAF50"); // Green success color
-            setTimeout(() => {
-                setStatusMessage(""); // Clear status message
-            }, 3000);
-        } else {
-            setStatusMessage("Incorrect code. Please try again.");
-            setStatusMessageColor("#FF5733"); // Red error color
-            setTimeout(() => {
-                setStatusMessage(""); // Clear status message
-            }, 3000);
-        }
-    };
 
-    if (!isUnlocked) {
-        return (
-            <div style={{ maxWidth: "960px", margin: "auto", padding: "20px", fontFamily: "'Courier New', monospace", backgroundColor: "#f9f9f9" }}>
-                <ComingSoonPage />
-                <h1 style={{ textAlign: "center", color: "#333", fontSize: "32px", fontWeight: "700", marginBottom: "20px", textTransform: "uppercase" }}>
-                    Enter Premium Code to Unlock Notes Page
-                </h1>
-
-                {/* Display Status Message */}
-                {statusMessage && (
-                    <div
-                        style={{
-                            marginBottom: "20px",
-                            padding: "15px",
-                            backgroundColor: statusMessageColor, // Apply the color
-                            color: "#fff",
-                            borderRadius: "8px",
-                            textAlign: "center",
-                            fontSize: "16px",
-                            fontWeight: "600",
-                            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-                            maxWidth: "90%",
-                            margin: "0 auto",
-                        }}
-                    >
-                        {statusMessage}
-                    </div>
-                )}
-
-                <input
-                    type="text"
-                    value={premiumCode}
-                    onChange={(e) => setPremiumCode(e.target.value)}
-                    placeholder="Enter code"
-                    style={{
-                        width: "100%",
-                        padding: "10px",
-                        fontSize: "20px",
-                        fontWeight: "700",
-                        borderRadius: "8px",
-                        border: "1px solid #ddd",
-                        marginBottom: "20px",
-                        outline: "none",
-                    }}
-                />
-
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "center", // Centers horizontally
-                        alignItems: "center", // Centers vertically
-                        textAlign: "center", // Aligns text in the center (optional)
-                    }}
-                >
-                    <button
-                        onClick={handleUnlock}
-                        style={{
-                            backgroundColor: "#4CAF50",
-                            color: "#fff",
-                            padding: "10px 20px",
-                            borderRadius: "5px",
-                            border: "none",
-                            cursor: "pointer",
-                            fontSize: "16px",
-                        }}
-                    >
-                        Unlock Page
-                    </button>
-                </div>
-
-            </div>
-        );
-    }
 
     return (
         <div style={{ maxWidth: "960px", margin: "auto", padding: "20px", fontFamily: "'Courier New', monospace", backgroundColor: "#f9f9f9" }}>

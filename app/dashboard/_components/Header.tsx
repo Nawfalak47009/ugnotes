@@ -31,7 +31,7 @@ function Header() {
   }, []);
 
   return (
-    <div className="p-5 shadow-lg bg-gradient-to-r from-blue-500 via-blue-500 to-indigo-600 text-white border-b-4 border-indigo-700 flex flex-col sm:flex-row justify-between items-center rounded-lg">
+    <div className="p-5 shadow-lg bg-blue-500 text-white border-b-4 border-blue-700 flex flex-col sm:flex-row justify-between items-center rounded-lg">
       <div>
         <motion.h1
           className="text-4xl sm:text-5xl font-extrabold tracking-tight"
