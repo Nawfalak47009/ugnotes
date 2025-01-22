@@ -11,12 +11,14 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, BarElemen
 import { jsPDF } from "jspdf"; // Import jsPDF
 import autoTable from "jspdf-autotable"; // Import autoTable function
 import dayjs from 'dayjs'; // Import dayjs for formatting dates
+import { useMediaQuery } from "@mui/material";
 
 // Register required components for charting
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, BarElement, Title, LinearScale);
 
 const ExpensesTracker: React.FC = () => {
   const { userId, isSignedIn } = useAuth();
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const [expenseName, setExpenseName] = useState("");
   const [amount, setAmount] = useState<string>("");
   const [category, setCategory] = useState<string>("");
@@ -128,17 +130,23 @@ const ExpensesTracker: React.FC = () => {
 
   // Chart data preparation
   const chartData = {
-    labels: expenseList.map(expense => expense.category),
+    labels: expenseList.map((expense) => expense.category),
     datasets: [
       {
         label: "Expenses",
-        data: expenseList.map(expense => expense.amount),
-        backgroundColor: ['#FF8C00', '#3498db', '#2ecc71', '#f39c12', '#e74c3c'], // Vibrant colors
-        borderColor: ['#FF8C00', '#3498db', '#2ecc71', '#f39c12', '#e74c3c'],
+        data: expenseList.map((expense) => expense.amount),
+        backgroundColor: ["#FF8C00", "#3498db", "#2ecc71", "#f39c12", "#e74c3c"],
+        borderColor: ["#FF8C00", "#3498db", "#2ecc71", "#f39c12", "#e74c3c"],
         borderWidth: 1,
       },
     ],
   };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false, // Allow charts to adjust height independently
+  };
+
 
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
@@ -186,33 +194,33 @@ const ExpensesTracker: React.FC = () => {
                 placeholder="Enter expense name"
                 value={expenseName}
                 onChange={(e) => setExpenseName(e.target.value)}
-                className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all"
+                className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
               />
               <Input
                 type="number"
                 placeholder="Amount"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all"
+                className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
               />
               <Input
                 type="text"
                 placeholder="Category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all"
+                className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
               />
               <Input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all"
+                className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
               />
             </div>
             <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
               <Button
                 onClick={handleAddExpense}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl transition-all"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-all"
               >
                 {editExpenseId ? "Update" : "Add"} Expense
               </Button>
@@ -231,21 +239,21 @@ const ExpensesTracker: React.FC = () => {
         {/* Loader */}
         {loading && (
           <div className="flex justify-center items-center py-4">
-            <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent border-solid rounded-full animate-spin"></div>
+            <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent border-solid rounded-full animate-spin"></div>
           </div>
         )}
 
         {/* Total Amount */}
         <div className="text-center py-6 bg-indigo-100 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold text-gray-800">Total Expenses</h2>
-          <p className="text-3xl font-bold text-indigo-700">${totalAmount.toFixed(2)}</p>
+          <p className="text-3xl font-bold text-blue-700">${totalAmount.toFixed(2)}</p>
         </div>
 
         {/* Expense List as Table */}
         <div className="overflow-x-auto mb-8">
           {expenseList.length > 0 ? (
             <table className="min-w-full table-auto bg-white rounded-xl shadow-lg overflow-hidden">
-              <thead className="bg-indigo-600 text-white">
+              <thead className="bg-blue-600 text-white">
                 <tr>
                   <th className="px-6 py-3 text-left">Expense Name</th>
                   <th className="px-6 py-3 text-left">Amount</th>
@@ -255,37 +263,37 @@ const ExpensesTracker: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-  {expenseList.map((expense) => (
-    <tr key={expense.id} className="border-b hover:bg-gray-50">
-      <td className="px-6 py-4">{expense.name}</td>
-      <td className="px-6 py-4">${expense.amount.toFixed(2)}</td>
-      <td className="px-6 py-4">{expense.category}</td>
-      <td className="px-6 py-4">{dayjs(expense.date).format("MMMM D, YYYY")}</td>
-      <td className="px-6 py-4">
-        <div className="flex justify-start space-x-2">
-          <Button
-            onClick={() => {
-              setExpenseName(expense.name);
-              setAmount(expense.amount.toString());
-              setCategory(expense.category);
-              setDate(expense.date);
-              setEditExpenseId(expense.id);
-            }}
-            className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg transition-all"
-          >
-            Edit
-          </Button>
-          <Button
-            onClick={() => handleDeleteExpense(expense.id)}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all"
-          >
-            Delete
-          </Button>
-        </div>
-      </td>
-    </tr>
-  ))}
-</tbody>
+                {expenseList.map((expense) => (
+                  <tr key={expense.id} className="border-b hover:bg-gray-50">
+                    <td className="px-6 py-4">{expense.name}</td>
+                    <td className="px-6 py-4">${expense.amount.toFixed(2)}</td>
+                    <td className="px-6 py-4">{expense.category}</td>
+                    <td className="px-6 py-4">{dayjs(expense.date).format("MMMM D, YYYY")}</td>
+                    <td className="px-6 py-4">
+                      <div className="flex justify-start space-x-2">
+                        <Button
+                          onClick={() => {
+                            setExpenseName(expense.name);
+                            setAmount(expense.amount.toString());
+                            setCategory(expense.category);
+                            setDate(expense.date);
+                            setEditExpenseId(expense.id);
+                          }}
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-all"
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteExpense(expense.id)}
+                          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all"
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
 
             </table>
           ) : (
@@ -295,20 +303,21 @@ const ExpensesTracker: React.FC = () => {
 
         {/* Charts */}
         <div className="flex justify-center items-center mb-6">
-          <Button onClick={() => setShowPieChart(!showPieChart)} className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl transition-all">
+          <Button
+            onClick={() => setShowPieChart(!showPieChart)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-all"
+          >
             Toggle Chart View
           </Button>
         </div>
 
-        {showPieChart ? (
-          <div className="max-w-xl mx-auto">
-            <Pie data={chartData} options={{ responsive: true }} />
-          </div>
-        ) : (
-          <div className="max-w-xl mx-auto">
-            <Bar data={chartData} options={{ responsive: true }} />
-          </div>
-        )}
+        <div className="relative max-w-full" style={{ height: isMobile ? "300px" : "500px" }}>
+          {showPieChart ? (
+            <Pie data={chartData} options={chartOptions} />
+          ) : (
+            <Bar data={chartData} options={chartOptions} />
+          )}
+        </div>
       </div>
     </div>
   );
