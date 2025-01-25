@@ -7,7 +7,6 @@ import {
   Bookmark,
   DollarSign,
   Contact,
-  Currency,
 } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -35,12 +34,12 @@ const SideNav: React.FC = () => {
   const path = usePathname();
 
   return (
-    <div className="h-screen bg-blue-500 shadow-xl border-r border-gray-300 overflow-y-auto relative pb-28">
+    <div className="h-screen bg-gradient-to-br from-white via-blue-50 to-blue-100 shadow-xl border-r border-gray-200 overflow-y-auto relative pb-28">
       {/* Logo Section */}
       <div className="flex justify-center mt-8 mb-10">
         <Image src="/creativity.png" alt="logo" width={90} height={90} />
       </div>
-      <hr className="border-gray-300 mb-4" />
+      <hr className="border-gray-200 mb-4" />
 
       {/* Menu List */}
       <div className="mt-4 space-y-2 px-6">
@@ -50,15 +49,15 @@ const SideNav: React.FC = () => {
             href={menu.path}
             className={`flex items-center gap-5 p-4 rounded-xl transition-all ease-in-out duration-300
                         ${path === menu.path
-              ? "bg-blue-800 text-white shadow-lg transform scale-105"
-              : "text-gray-300 hover:bg-blue-600 hover:text-white hover:shadow-md hover:transform hover:scale-105"}`}
+              ? "bg-blue-600 text-white shadow-lg transform scale-105"
+              : "text-gray-500 hover:bg-blue-400 hover:text-blue-900 hover:shadow-md hover:transform hover:scale-105"}`}
           >
             <menu.icon
               className={`h-6 w-6 ${
                 path === menu.path ? "text-white" : "text-gray-400"
               }`}
             />
-            <span className="font-medium text-lg">{menu.name}</span>
+            <span className="font-semibold text-lg">{menu.name}</span>
           </Link>
         ))}
       </div>
@@ -69,14 +68,14 @@ const SideNav: React.FC = () => {
           width: 8px;
         }
         ::-webkit-scrollbar-thumb {
-          background: #a5b4fc; /* Light blue */
+          background: #6d8ff6; /* Light blue */
           border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-          background: #6d8ff6; /* Slightly darker light blue */
+          background: #4a74d3; /* Slightly darker light blue */
         }
         ::-webkit-scrollbar-track {
-          background: #f0f9ff; /* Very light blue */
+          background: #f9fafb; /* Lightest blue-gray */
         }
       `}</style>
     </div>

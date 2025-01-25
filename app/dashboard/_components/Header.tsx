@@ -31,10 +31,10 @@ function Header() {
   }, []);
 
   return (
-    <div className="p-5 shadow-lg bg-blue-500 text-white border-b-4 border-blue-700 flex flex-col sm:flex-row justify-between items-center rounded-lg">
+    <div className="p-5 bg-gradient-to-br from-white via-blue-100 to-blue-200 shadow-xl text-gray-800 border-b-4 border-blue-400 flex flex-col sm:flex-row justify-between items-center rounded-lg">
       <div>
         <motion.h1
-          className="text-4xl sm:text-5xl font-extrabold tracking-tight"
+          className="text-4xl sm:text-5xl font-extrabold text-gray-800 tracking-tight"
           initial={{ opacity: 0, y: -20 }} // Initial animation state
           animate={{ opacity: 1, y: 0 }} // Animate to full opacity and position
           transition={{ duration: 1 }} // Smooth transition
@@ -42,7 +42,7 @@ function Header() {
           Welcome, {user?.fullName || "User"} 👋
         </motion.h1>
         <motion.p
-          className="text-lg text-gray-200 mt-2"
+          className="text-lg text-gray-600 mt-2"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1.2 }}
@@ -60,7 +60,6 @@ function Header() {
           className="flex items-center gap-4"
         >
           <UserButton />
-          
         </motion.div>
       </div>
     </div>
