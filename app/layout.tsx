@@ -15,7 +15,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "UG NOTES",
+  title: "One-note AI",
   description: "Created by Starstreamtech",
 };
 

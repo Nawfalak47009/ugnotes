@@ -26,12 +26,12 @@ const CircleUIPage = () => {
         className="text-center z-10"
       >
         <motion.h1
-          className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-blue-400 drop-shadow-2xl"
+          className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-400 drop-shadow-2xl"
           initial={{ x: -200 }}
           animate={{ x: 0 }}
           transition={{ type: 'spring', stiffness: 120 }}
         >
-          UG NOTES
+          ONE-NOTE AI
         </motion.h1>
         <motion.p
           className="text-lg sm:text-xl lg:text-2xl mb-4 max-w-xl mx-auto text-white"
@@ -58,7 +58,7 @@ const CircleUIPage = () => {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ duration: 2, type: 'spring', stiffness: 60 }}
-          className="absolute w-56 sm:w-64 md:w-80 lg:w-96 h-56 sm:h-64 md:h-80 lg:h-96 bg-gradient-to-br from-teal-500 to-teal-300 rounded-full flex items-center justify-center shadow-2xl transform hover:scale-110 hover:rotate-6 transition-all duration-300"
+          className="absolute w-56 sm:w-64 md:w-80 lg:w-96 h-56 sm:h-64 md:h-80 lg:h-96 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center shadow-2xl transform hover:scale-110 hover:rotate-6 transition-all duration-300"
         >
           <Image
             src="/creativity.png"
@@ -119,8 +119,7 @@ const CircleUIPage = () => {
         transition={{ duration: 1, delay: 1.2 }}
         className="absolute bottom-6 text-sm text-gray-300 z-10"
       >
-        <p>&copy; 2024 UGNOTES. All Rights Reserved.</p>
-        <p className="italic">Crafted with 💙 by UGNOTES Team</p>
+        <p>&copy; 2024 ONE-NOTE AI. All Rights Reserved.</p>
       </motion.footer>
 
       {/* Interactive Particles */}

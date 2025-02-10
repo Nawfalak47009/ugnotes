@@ -127,6 +127,23 @@ export default [
         ]
     },
     {
+        "name": "Aptitude Answer Generator",
+        "desc": "Generate detailed solutions for aptitude questions.",
+        "category": "Aptitude",
+        "icon": "/aptitude.png",
+        "aiPrompt": "Provide a step-by-step solution for the given aptitude question.",
+        "slug": "aptitude-answer-generator",
+        "form": [
+            {
+                "label": "Enter your aptitude question",
+                "field": "textarea",
+                "name": "question",
+                "required": true
+            }
+        ]
+    },
+
+    {
         name: 'Story Title Creator',
         desc: 'Generate compelling titles for your stories.',
         category: 'Story',
@@ -189,7 +206,7 @@ export default [
                 required: true
             }
         ]
-    },{
+    }, {
         name: 'Math Problem Solver',
         desc: 'Solve complex math problems and show step-by-step solutions.',
         category: 'Math',
@@ -980,5 +997,5 @@ export default [
     }
 
 
-    
+
 ];
