@@ -34,7 +34,7 @@ const CircleUIPage = () => {
           ONE-NOTE AI
         </motion.h1>
         <motion.p
-          className="text-lg sm:text-xl lg:text-2xl mb-4 max-w-xl mx-auto text-white"
+          className="text-lg sm:text-xl lg:text-2xl mb-4 max-w-xl mx-auto text-white bg-transparent"
           initial={{ x: 200 }}
           animate={{ x: 0 }}
           transition={{ type: 'spring', stiffness: 120 }}
@@ -58,7 +58,9 @@ const CircleUIPage = () => {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ duration: 2, type: 'spring', stiffness: 60 }}
-          className="absolute w-56 sm:w-64 md:w-80 lg:w-96 h-56 sm:h-64 md:h-80 lg:h-96 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center shadow-2xl transform hover:scale-110 hover:rotate-6 transition-all duration-300"
+          className="absolute w-56 sm:w-64 md:w-80 lg:w-96 h-56 sm:h-64 md:h-80 lg:h-96 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center 
+  shadow-[0_0_20px_#3b82f6,0_0_40px_#2563eb] ring-8 ring-blue-500 shadow-blue-500/90 
+  animate-pulse transform hover:scale-110 hover:rotate-6 hover:shadow-[0_0_30px_#2563eb,0_0_60px_#1e40af] transition-all duration-300"
         >
           <Image
             src="/creativity.png"
@@ -69,6 +71,7 @@ const CircleUIPage = () => {
             className="transform scale-110 hover:scale-125 transition-all duration-300"
           />
         </motion.div>
+
 
         {/* Medium Circle */}
         <motion.div
@@ -97,9 +100,8 @@ const CircleUIPage = () => {
         <button
           onClick={handleGetStarted}
           disabled={loading}
-          className={`${
-            loading ? 'bg-opacity-50 cursor-not-allowed' : 'bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600'
-          } px-10 py-4 sm:px-8 sm:py-3 md:px-10 md:py-4 lg:px-12 lg:py-5 rounded-full text-lg font-bold text-black shadow-xl transform transition-all duration-300 hover:scale-110 hover:shadow-2xl animate-pulse`}
+          className={`${loading ? 'bg-opacity-50 cursor-not-allowed' : 'bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600'
+            } px-10 py-4 sm:px-8 sm:py-3 md:px-10 md:py-4 lg:px-12 lg:py-5 rounded-full text-lg font-bold text-black shadow-xl transform transition-all duration-300 hover:scale-110 hover:shadow-2xl animate-pulse`}
         >
           {loading ? (
             <div className="flex items-center justify-center">
