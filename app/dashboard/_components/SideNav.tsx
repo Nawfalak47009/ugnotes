@@ -13,7 +13,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import i18next from "../../i18n";
+
 
 type MenuItem = {
   name: string;
@@ -26,10 +26,7 @@ const SideNav: React.FC = () => {
   const [lang, setLang] = useState("en");
   const path = usePathname();
 
-  const changeLanguage = (lng: string) => {
-    i18next.changeLanguage(lng);
-    setLang(lng);
-  };
+  
 
   const MenuList: MenuItem[] = [
     { name: t("Home"), icon: Home, path: "/dashboard" },
@@ -72,29 +69,6 @@ const SideNav: React.FC = () => {
           </Link>
         ))}
       </div>
-
-      {/* Language Selector (Fixed at Bottom) */}
-      <div className="px-6 py-4 bg-gray-100 flex items-center justify-between shadow-md border-t border-gray-300">
-  <span className="font-medium text-gray-700">{t("Select Language")}</span>
-  <div className="flex gap-2 border-2 border-blue-400 rounded-xl p-1 bg-white shadow-sm">
-    <button
-      className={`px-3 py-2 rounded-lg transition ${
-        lang === "en" ? "bg-blue-600 text-white shadow-md" : "bg-gray-200 text-gray-700"
-      }`}
-      onClick={() => changeLanguage("en")}
-    >
-      🇬🇧 EN
-    </button>
-    <button
-      className={`px-3 py-2 rounded-lg transition ${
-        lang === "ru" ? "bg-blue-600 text-white shadow-md" : "bg-gray-200 text-gray-700"
-      }`}
-      onClick={() => changeLanguage("ru")}
-    >
-      🇷🇺 RU
-    </button>
-  </div>
-</div>
 
     </div>
   );
